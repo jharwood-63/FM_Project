@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">FamilyMapClient</string>
-    <string name="first_name">firstName</string>
+    <string name="login_form_name">Register/Login</string>
+    <string name="first_name">First Name:</string>
+    <string name="last_name">Last Name:</string>
+    <string name="username">Username:</string>
+    <string name="password">Password:</string>
+    <string name="email">Email:</string>
+    <string name="gender">Gender:</string>
 </resources>

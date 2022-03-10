@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+dependencies {
+    implementation project(path: ':ServerResources')
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+}

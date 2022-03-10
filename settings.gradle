@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "FamilyMapClient"
-include ':app'
+include ':FamilyMapClient'
 include ':ServerResources'
 include ':FamilyMapServer'
 include ':ServerResources_test'

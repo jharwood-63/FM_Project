@@ -10,10 +10,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/FamilyMapClient" />
             <option value="$PROJECT_DIR$/FamilyMapServer" />
             <option value="$PROJECT_DIR$/ServerResources" />
             <option value="$PROJECT_DIR$/ServerResources_test" />
-            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

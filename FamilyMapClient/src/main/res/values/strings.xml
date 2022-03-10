@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FamilyMapClient</string>
+    <string name="first_name">firstName</string>
 </resources>

@@ -1,5 +1,11 @@
 package data;
 
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -8,6 +14,7 @@ import java.util.Set;
 
 import model.Event;
 import model.Person;
+import result.PersonResult;
 
 public class DataCache {
     private static DataCache instance;
@@ -23,18 +30,18 @@ public class DataCache {
 
     private DataCache(){}
 
-    String authToken;
+    private String authToken;
 
-    Map<String, Person> personById;
-    Map<String, Event> eventById;
+    private Map<String, Person> personById;
+    private Map<String, Event> eventById;
 
     //Key => personID, Value => list of all events associated with that person ID
-    Map<String, List<Event>> personEvents;
+    private Map<String, List<Event>> personEvents;
 
-    Set<String> paternalMales;
-    Set<String> paternalFemales;
-    Set<String> maternalMales;
-    Set<String> maternalFemales;
+    private Set<String> paternalMales;
+    private Set<String> paternalFemales;
+    private Set<String> maternalMales;
+    private Set<String> maternalFemales;
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -49,7 +56,7 @@ public class DataCache {
 
     }
 
-    private void fillIdMaps(String urlString) {
+    private void fillIdMaps(String urlString, String resultClass) throws IOException {
         try {
             URL url = new URL(urlString);
 
@@ -62,8 +69,24 @@ public class DataCache {
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = connection.getInputStream();
+                Reader respBody = new InputStreamReader(inputStream);
+                if (resultClass.equals("person")) {
 
+                }
+                else if (resultClass.equals("event")) {
+
+                }
             }
         }
+        catch (IOException e) {
+            throw new IOException("Error: unable to fill id maps");
+        }
+    }
+
+    private void fillPersonById(Reader respBody) {
+        Gson gson = new Gson();
+        PersonResult personResult = (PersonResult) gson.fromJson(respBody, PersonResult.class);
+
     }
 }

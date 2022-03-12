@@ -14,6 +14,7 @@ import java.util.Set;
 
 import model.Event;
 import model.Person;
+import result.EventResult;
 import result.PersonResult;
 
 public class DataCache {
@@ -47,16 +48,18 @@ public class DataCache {
         this.authToken = authToken;
     }
 
-    public void fillDataCache() {
+    public void fillDataCache() throws IOException {
         /*
         * api calls:
         * all persons associated with user => /person
         * all events associated with the user => /event
          */
 
+        fillIdMaps("localhost:7979/person");
+        fillIdMaps("localhost:7979/event");
     }
 
-    private void fillIdMaps(String urlString, String resultClass) throws IOException {
+    private void fillIdMaps(String urlString) throws IOException {
         try {
             URL url = new URL(urlString);
 
@@ -71,11 +74,11 @@ public class DataCache {
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 InputStream inputStream = connection.getInputStream();
                 Reader respBody = new InputStreamReader(inputStream);
-                if (resultClass.equals("person")) {
-
+                if (urlString.contains("person")) {
+                    fillPersonById(respBody);
                 }
-                else if (resultClass.equals("event")) {
-
+                else if (urlString.contains("event")) {
+                    fillEventById(respBody);
                 }
             }
         }
@@ -88,5 +91,47 @@ public class DataCache {
         Gson gson = new Gson();
         PersonResult personResult = (PersonResult) gson.fromJson(respBody, PersonResult.class);
 
+        Person[] persons = personResult.getData();
+        for (int i = 0; i < persons.length; i++) {
+            personById.put(persons[i].getPersonID(), persons[i]);
+        }
+    }
+
+    private void fillEventById(Reader respBody) {
+        Gson gson = new Gson();
+        EventResult eventResult = (EventResult) gson.fromJson(respBody, EventResult.class);
+
+        Event[] events = eventResult.getData();
+        for (int i = 0; i < events.length; i++) {
+            eventById.put(events[i].getEventID(), events[i]);
+        }
+    }
+
+    public Map<String, Person> getPersonById() {
+        return personById;
+    }
+
+    public Map<String, Event> getEventById() {
+        return eventById;
+    }
+
+    public Map<String, List<Event>> getPersonEvents() {
+        return personEvents;
+    }
+
+    public Set<String> getPaternalMales() {
+        return paternalMales;
+    }
+
+    public Set<String> getPaternalFemales() {
+        return paternalFemales;
+    }
+
+    public Set<String> getMaternalMales() {
+        return maternalMales;
+    }
+
+    public Set<String> getMaternalFemales() {
+        return maternalFemales;
     }
 }

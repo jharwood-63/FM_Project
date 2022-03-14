@@ -8,12 +8,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import model.Event;
 import model.Person;
+import model.User;
 import result.EventResult;
 import result.PersonResult;
 
@@ -32,17 +35,18 @@ public class DataCache {
     private DataCache(){}
 
     private String authToken;
+    private User user;
 
-    private Map<String, Person> personById;
-    private Map<String, Event> eventById;
+    private Map<String, Person> personById = new HashMap<>();
+    private Map<String, Event> eventById = new HashMap<>();
 
     //Key => personID, Value => list of all events associated with that person ID
     private Map<String, List<Event>> personEvents;
 
-    private Set<String> paternalMales;
-    private Set<String> paternalFemales;
-    private Set<String> maternalMales;
-    private Set<String> maternalFemales;
+    private Set<String> paternalMales = new HashSet<>();
+    private Set<String> paternalFemales = new HashSet<>();
+    private Set<String> maternalMales = new HashSet<>();
+    private Set<String> maternalFemales = new HashSet<>();
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -55,11 +59,13 @@ public class DataCache {
         * all events associated with the user => /event
          */
 
-        fillIdMaps("localhost:7979/person");
-        fillIdMaps("localhost:7979/event");
+        fillIdMaps("http://localhost:7979/person");
+        fillIdMaps("http://localhost:7979/event");
     }
 
     private void fillIdMaps(String urlString) throws IOException {
+        //FIXME: FOR TESTING ONLY
+        setAuthToken("ced05a8a-cf08-409e-8cbd-d6b284d3d467");
         try {
             URL url = new URL(urlString);
 
@@ -80,6 +86,10 @@ public class DataCache {
                 else if (urlString.contains("event")) {
                     fillEventById(respBody);
                 }
+            }
+            else {
+                //FIXME: NOT SURE WHAT TO DO HERE YET
+                throw new IOException();
             }
         }
         catch (IOException e) {
@@ -105,6 +115,16 @@ public class DataCache {
         for (int i = 0; i < events.length; i++) {
             eventById.put(events[i].getEventID(), events[i]);
         }
+    }
+
+    private void sortData() {
+        //find user fatherID and motherID
+        //find mother and father persons and go back from there
+        //sort into male and female sets
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Map<String, Person> getPersonById() {

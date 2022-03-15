@@ -36,6 +36,7 @@ public class DataCache {
 
     private String authToken;
     private User user;
+    private Person userPerson;
 
     private Map<String, Person> personById = new HashMap<>();
     private Map<String, Event> eventById = new HashMap<>();
@@ -61,11 +62,22 @@ public class DataCache {
 
         fillIdMaps("http://localhost:7979/person");
         fillIdMaps("http://localhost:7979/event");
+
+        userPerson = findPerson(user.getPersonID());
+
+        if (userPerson != null) {
+            Person father = findPerson(userPerson.getFatherID());
+            Person mother = findPerson(userPerson.getMotherID());
+
+            paternalMales.add(father.getPersonID());
+            maternalFemales.add(mother.getPersonID());
+
+            sortPersons(father, "paternal");
+            sortPersons(mother, "maternal");
+        }
     }
 
     private void fillIdMaps(String urlString) throws IOException {
-        //FIXME: FOR TESTING ONLY
-        setAuthToken("ced05a8a-cf08-409e-8cbd-d6b284d3d467");
         try {
             URL url = new URL(urlString);
 
@@ -117,14 +129,62 @@ public class DataCache {
         }
     }
 
-    private void sortData() {
-        //find user fatherID and motherID
-        //find mother and father persons and go back from there
-        //sort into male and female sets
+    private void sortPersons(Person parent, String parentType) {
+        /*
+        * Recursive Ideas:
+        * start with user father and mother
+        * keep calling find until fatherID and motherId is null
+        * add males to male set
+        * add females to female set
+         */
+
+        Person father = findPerson(parent.getFatherID());
+        Person mother = findPerson(parent.getMotherID());
+
+        if (father != null) {
+            sortPersons(father, parentType);
+        }
+
+        if (mother != null) {
+            sortPersons(mother, parentType);
+        }
+
+        if (parentType.equals("paternal")) {
+            if (parent.getGender().equals("m")) {
+                paternalMales.add(parent.getPersonID());
+            }
+            else if (parent.getGender().equals("f")) {
+                paternalFemales.add(parent.getPersonID());
+            }
+        }
+        else if (parentType.equals("maternal")) {
+            if (parent.getGender().equals("m")) {
+                maternalMales.add(parent.getPersonID());
+            }
+            else if (parent.getGender().equals("f")) {
+                maternalFemales.add(parent.getPersonID());
+            }
+        }
+    }
+
+    private Person findPerson(String personID) {
+        if (personID != null || !personID.equals("")) {
+            for (Map.Entry<String, Person> pair : personById.entrySet()) {
+                if (pair.getKey().equals(personID)) {
+                    return pair.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    private void setPerson(Person person) {
+        this.userPerson = person;
     }
 
     public Map<String, Person> getPersonById() {

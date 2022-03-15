@@ -9,6 +9,7 @@ import java.util.Map;
 
 import data.DataCache;
 import model.Person;
+import model.User;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -24,6 +25,10 @@ public class ExampleUnitTest {
     @Test
     public void dataCacheTest() throws IOException {
         DataCache dataCache = DataCache.getInstance();
+
+        dataCache.setAuthToken("ced05a8a-cf08-409e-8cbd-d6b284d3d467");
+        User testUser = new User("sheila", "parker", "sheila@parker.com", "Sheila", "Parker", "f", "e6fa2c63-3736-49bb-b6a3-84b230c588cf");
+        dataCache.setUser(testUser);
 
         dataCache.fillDataCache();
         /*

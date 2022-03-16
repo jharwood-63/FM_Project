@@ -49,14 +49,13 @@ public class DataCache {
     private final Set<String> maternalFemales = new HashSet<>();
 
     public void fillDataCache() throws IOException {
-        /*
-        * api calls:
-        * all persons associated with user => /person
-        * all events associated with the user => /event
-         */
+        ServerProxy serverProxy = new ServerProxy();
 
-        fillIdMaps("http://localhost:7979/person");
-        fillIdMaps("http://localhost:7979/event");
+        PersonResult personResult = (PersonResult) serverProxy.doGet("http://localhost:7979/person", this.authToken);
+        EventResult eventResult = (EventResult) serverProxy.doGet("http://localhost:7979/event", this.authToken);
+
+        fillPersonById(personResult);
+        fillEventById(eventResult);
 
         sortEvents();
 
@@ -74,53 +73,17 @@ public class DataCache {
         }
     }
 
-    private void fillIdMaps(String urlString) throws IOException {
-        try {
-            URL url = new URL(urlString);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setReadTimeout(5000);
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
-            connection.addRequestProperty("Authorization", this.authToken);
-            connection.connect();
-
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStream inputStream = connection.getInputStream();
-                Reader respBody = new InputStreamReader(inputStream);
-                if (urlString.contains("person")) {
-                    fillPersonById(respBody);
-                }
-                else if (urlString.contains("event")) {
-                    fillEventById(respBody);
-                }
-            }
-            else {
-                //FIXME: NOT SURE WHAT TO DO HERE YET
-                throw new IOException();
-            }
-        }
-        catch (IOException e) {
-            throw new IOException("Error: unable to fill id maps");
-        }
-    }
-
-    private void fillPersonById(Reader respBody) {
-        Gson gson = new Gson();
-        PersonResult personResult = (PersonResult) gson.fromJson(respBody, PersonResult.class);
-
+    private void fillPersonById(PersonResult personResult) {
         Person[] persons = personResult.getData();
+
         for (Person person : persons) {
             personById.put(person.getPersonID(), person);
         }
     }
 
-    private void fillEventById(Reader respBody) {
-        Gson gson = new Gson();
-        EventResult eventResult = (EventResult) gson.fromJson(respBody, EventResult.class);
-
+    private void fillEventById(EventResult eventResult) {
         Event[] events = eventResult.getData();
+
         for (Event event : events) {
             eventById.put(event.getEventID(), event);
         }

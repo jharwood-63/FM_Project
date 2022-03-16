@@ -24,20 +24,13 @@ public class ServerProxy {
             connection.addRequestProperty("Authorization", authToken);
             connection.connect();
 
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                Gson gson = new Gson();
-                InputStream inputStream = connection.getInputStream();
-                Reader respBody = new InputStreamReader(inputStream);
-                return gson.fromJson(respBody, Result.class);
-            }
-            else {
-                //FIXME: NOT SURE WHAT TO DO HERE YET
-                //if it gets here that means the success status is false so you should print out the message that was returned
-                throw new IOException();
-            }
+            Gson gson = new Gson();
+            InputStream inputStream = connection.getInputStream();
+            Reader respBody = new InputStreamReader(inputStream);
+            return gson.fromJson(respBody, Result.class);
         }
         catch (IOException e) {
-            throw new IOException("Error: unable to fill id maps");
+            throw new IOException("Error: unable to get data from database");
         }
     }
 }

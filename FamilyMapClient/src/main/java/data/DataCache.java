@@ -54,22 +54,28 @@ public class DataCache {
         PersonResult personResult = (PersonResult) serverProxy.doGet("http://localhost:7979/person", this.authToken);
         EventResult eventResult = (EventResult) serverProxy.doGet("http://localhost:7979/event", this.authToken);
 
-        fillPersonById(personResult);
-        fillEventById(eventResult);
+        if (personResult.isSuccess() && eventResult.isSuccess()) {
+            fillPersonById(personResult);
+            fillEventById(eventResult);
 
-        sortEvents();
+            sortEvents();
 
-        userPerson = findPerson(user.getPersonID());
+            userPerson = findPerson(user.getPersonID());
 
-        if (userPerson != null) {
-            Person father = findPerson(userPerson.getFatherID());
-            Person mother = findPerson(userPerson.getMotherID());
+            if (userPerson != null) {
+                Person father = findPerson(userPerson.getFatherID());
+                Person mother = findPerson(userPerson.getMotherID());
 
-            paternalMales.add(father.getPersonID());
-            maternalFemales.add(mother.getPersonID());
+                paternalMales.add(father.getPersonID());
+                maternalFemales.add(mother.getPersonID());
 
-            sortPersons(father, "paternal");
-            sortPersons(mother, "maternal");
+                sortPersons(father, "paternal");
+                sortPersons(mother, "maternal");
+            }
+        }
+        else {
+            //FIXME: Do something with the message not just printing it out on the terminal
+            System.out.println("Error Messages: " + personResult.getMessage() + eventResult.getMessage());
         }
     }
 

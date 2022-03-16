@@ -42,7 +42,7 @@ public class DataCache {
     private Map<String, Event> eventById = new HashMap<>();
 
     //Key => personID, Value => list of all events associated with that person ID
-    private Map<String, List<Event>> personEvents;
+    private Map<String, Set<Event>> personEvents = new HashMap<>();
 
     private Set<String> paternalMales = new HashSet<>();
     private Set<String> paternalFemales = new HashSet<>();
@@ -75,6 +75,8 @@ public class DataCache {
             sortPersons(father, "paternal");
             sortPersons(mother, "maternal");
         }
+
+        sortEvents();
     }
 
     private void fillIdMaps(String urlString) throws IOException {
@@ -179,6 +181,34 @@ public class DataCache {
         return null;
     }
 
+    private void sortEvents() {
+        //run through event map
+        //for each event, check if personID has already been added as a key
+        //if it has, add that event to the event set associated with the personID
+        //if it hasn't, create a new set with that event and add the personID and set to the map
+
+        for (Map.Entry<String, Event> eventEntry : eventById.entrySet()) {
+            String personID = eventEntry.getValue().getPersonID();
+            if (personEvents.containsKey(personID)) {
+                addToMap(personID, eventEntry.getValue());
+            }
+            else {
+                Set<Event> events = new HashSet<>();
+                events.add(eventEntry.getValue());
+                personEvents.put(personID, events);
+            }
+        }
+    }
+
+    private void addToMap(String personID, Event event) {
+        for (Map.Entry<String, Set<Event>> entry : personEvents.entrySet()) {
+            if (entry.getKey().equals(personID)) {
+                entry.getValue().add(event);
+                break;
+            }
+        }
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -195,7 +225,7 @@ public class DataCache {
         return eventById;
     }
 
-    public Map<String, List<Event>> getPersonEvents() {
+    public Map<String, Set<Event>> getPersonEvents() {
         return personEvents;
     }
 

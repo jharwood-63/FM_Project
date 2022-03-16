@@ -1,13 +1,6 @@
 package data;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -96,14 +89,6 @@ public class DataCache {
     }
 
     private void sortPersons(Person parent, String parentType) {
-        /*
-        * Recursive Ideas:
-        * start with user father and mother
-        * keep calling find until fatherID and motherId is null
-        * add males to male set
-        * add females to female set
-         */
-
         Person father = findPerson(parent.getFatherID());
         Person mother = findPerson(parent.getMotherID());
 
@@ -115,6 +100,10 @@ public class DataCache {
             sortPersons(mother, parentType);
         }
 
+        addToSet(parent, parentType);
+    }
+
+    private void addToSet(Person parent, String parentType) {
         if (parentType.equals("paternal")) {
             if (parent.getGender().equals("m")) {
                 paternalMales.add(parent.getPersonID());

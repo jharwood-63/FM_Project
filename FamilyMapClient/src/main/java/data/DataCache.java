@@ -146,11 +146,6 @@ public class DataCache {
     }
 
     private void sortEvents() {
-        //run through event map
-        //for each event, check if personID has already been added as a key
-        //if it has, add that event to the event set associated with the personID
-        //if it hasn't, create a new set with that event and add the personID and set to the map
-
         for (Map.Entry<String, Event> eventEntry : eventById.entrySet()) {
             String personID = eventEntry.getValue().getPersonID();
             if (personEvents.containsKey(personID)) {

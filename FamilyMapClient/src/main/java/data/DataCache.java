@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,20 +37,16 @@ public class DataCache {
     private User user;
     private Person userPerson;
 
-    private Map<String, Person> personById = new HashMap<>();
-    private Map<String, Event> eventById = new HashMap<>();
+    private final Map<String, Person> personById = new HashMap<>();
+    private final Map<String, Event> eventById = new HashMap<>();
 
-    //Key => personID, Value => list of all events associated with that person ID
-    private Map<String, Set<Event>> personEvents = new HashMap<>();
+    //Key => personID, Value => set of all events associated with that person ID
+    private final Map<String, Set<Event>> personEvents = new HashMap<>();
 
-    private Set<String> paternalMales = new HashSet<>();
-    private Set<String> paternalFemales = new HashSet<>();
-    private Set<String> maternalMales = new HashSet<>();
-    private Set<String> maternalFemales = new HashSet<>();
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
+    private final Set<String> paternalMales = new HashSet<>();
+    private final Set<String> paternalFemales = new HashSet<>();
+    private final Set<String> maternalMales = new HashSet<>();
+    private final Set<String> maternalFemales = new HashSet<>();
 
     public void fillDataCache() throws IOException {
         /*
@@ -62,6 +57,8 @@ public class DataCache {
 
         fillIdMaps("http://localhost:7979/person");
         fillIdMaps("http://localhost:7979/event");
+
+        sortEvents();
 
         userPerson = findPerson(user.getPersonID());
 
@@ -75,8 +72,6 @@ public class DataCache {
             sortPersons(father, "paternal");
             sortPersons(mother, "maternal");
         }
-
-        sortEvents();
     }
 
     private void fillIdMaps(String urlString) throws IOException {
@@ -116,8 +111,8 @@ public class DataCache {
         PersonResult personResult = (PersonResult) gson.fromJson(respBody, PersonResult.class);
 
         Person[] persons = personResult.getData();
-        for (int i = 0; i < persons.length; i++) {
-            personById.put(persons[i].getPersonID(), persons[i]);
+        for (Person person : persons) {
+            personById.put(person.getPersonID(), person);
         }
     }
 
@@ -126,8 +121,8 @@ public class DataCache {
         EventResult eventResult = (EventResult) gson.fromJson(respBody, EventResult.class);
 
         Event[] events = eventResult.getData();
-        for (int i = 0; i < events.length; i++) {
-            eventById.put(events[i].getEventID(), events[i]);
+        for (Event event : events) {
+            eventById.put(event.getEventID(), event);
         }
     }
 
@@ -211,6 +206,10 @@ public class DataCache {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     private void setPerson(Person person) {

@@ -1,4 +1,4 @@
-package data;
+package com.example.familymapclient;
 
 import com.google.gson.Gson;
 
@@ -9,6 +9,9 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import requests.LoginRequest;
+import requests.RegisterRequest;
+import requests.UserRequest;
 import result.Result;
 
 public class ServerProxy {
@@ -32,5 +35,30 @@ public class ServerProxy {
         catch (IOException e) {
             throw new IOException("Error: unable to get data from database");
         }
+    }
+
+    public Result doPost(URL url, UserRequest userRequest) throws IOException {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            //Add all the request properties
+
+            connection.addRequestProperty("username", userRequest.getUsername());
+            connection.addRequestProperty("password", userRequest.getPassword());
+
+            //check if it is a register request and then add those attributes
+
+            connection.connect();
+
+
+        }
+        catch (IOException e) {
+            throw new IOException("Error: unable to perform post");
+        }
+
     }
 }

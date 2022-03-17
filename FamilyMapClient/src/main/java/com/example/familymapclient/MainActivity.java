@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public void notifyDone() {
-        //I think this is where you put the code for the login
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 

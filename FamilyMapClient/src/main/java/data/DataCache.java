@@ -1,5 +1,7 @@
 package data;
 
+import com.example.familymapclient.ServerProxy;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;

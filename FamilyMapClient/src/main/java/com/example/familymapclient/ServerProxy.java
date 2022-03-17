@@ -27,10 +27,7 @@ public class ServerProxy {
             connection.addRequestProperty("Authorization", authToken);
             connection.connect();
 
-            Gson gson = new Gson();
-            InputStream inputStream = connection.getInputStream();
-            Reader respBody = new InputStreamReader(inputStream);
-            return gson.fromJson(respBody, Result.class);
+            return getResult(connection);
         }
         catch (IOException e) {
             throw new IOException("Error: unable to get data from database");
@@ -45,20 +42,32 @@ public class ServerProxy {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            //Add all the request properties
-
             connection.addRequestProperty("username", userRequest.getUsername());
             connection.addRequestProperty("password", userRequest.getPassword());
 
             //check if it is a register request and then add those attributes
+            if (url.toString().contains("register")) {
+                RegisterRequest registerRequest = (RegisterRequest) userRequest;
+                connection.addRequestProperty("email", registerRequest.getEmail());
+                connection.addRequestProperty("firstName", registerRequest.getFirstName());
+                connection.addRequestProperty("lastName", registerRequest.getLastName());
+                connection.addRequestProperty("gender", registerRequest.getGender());
+            }
 
             connection.connect();
 
-
+            return getResult(connection);
         }
         catch (IOException e) {
             throw new IOException("Error: unable to perform post");
         }
 
+    }
+
+    private Result getResult(HttpURLConnection connection) throws IOException {
+        Gson gson = new Gson();
+        InputStream inputStream = connection.getInputStream();
+        Reader respBody = new InputStreamReader(inputStream);
+        return gson.fromJson(respBody, Result.class);
     }
 }

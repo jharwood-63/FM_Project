@@ -10,9 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.URL;
+
+import data.DataCache;
+import model.Person;
+import model.User;
+import requests.LoginRequest;
+import requests.UserRequest;
+import result.LoginResult;
+import result.RegisterResult;
+import result.Result;
 
 
 public class LoginFragment extends Fragment {
@@ -33,23 +44,31 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         //Create another listener that works with the register button
 
-
+        EditText username = (EditText) view.findViewById(R.id.usernameField);
+        EditText password = (EditText) view.findViewById(R.id.passwordField);
 
         Button loginButton = view.findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //I think this is where you put the code for the login
-
                 Handler uiThreadMessageHandler = new Handler() {
                     @Override
                     public void handleMessage(Message message) {
-                        //I think this is where you do the toast that displays the first and last name of whoever is logging in
                         Bundle bundle = message.getData();
-                        String toastString = getString(R.string.login_user_name, bundle.getString("name"));
+
+                        DataCache dataCache = DataCache.getInstance();
+                        dataCache.setAuthToken(bundle.getString("authtoken"));
+                        dataCache.setPerson(bundle.getString("personID"));
+                        Person person = dataCache.getUserPerson();
+
+                        dataCache.fillDataCache();
+
+                        String toastString = person.getFirstName() + " " + person.getLastName();
                         Toast.makeText(getActivity(), toastString,Toast.LENGTH_LONG).show();
                     }
                 };
+
+                UserRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
 
                 if (listener != null) {
                     listener.notifyDone();
@@ -72,22 +91,49 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    private static class LoginTask implements Runnable {
+    private static class LoginRegisterTask implements Runnable {
         private final Handler messageHandler;
         private final URL url;
+        private final UserRequest userRequest;
 
-        public LoginTask(Handler messageHandler, URL url) {
+        public LoginRegisterTask(Handler messageHandler, URL url, UserRequest userRequest) {
             this.messageHandler = messageHandler;
             this.url = url;
+            this.userRequest = userRequest;
         }
 
         @Override
         public void run() {
             ServerProxy serverProxy = new ServerProxy();
+            //create the request for either the login or the register
+            //is the way im doing it gonna erase data?
 
+            LoginResult loginRegisterResult = null;
 
+            try {
+                loginRegisterResult = (LoginResult) serverProxy.doPost(url, userRequest);
+            }
+            catch (IOException e) {
+                //do something with this but you can't throw it
+                //maybe put something in the bundle to say there was an error and then deal with it somewhere else
+            }
+            finally {
+                sendMessage(loginRegisterResult);
+            }
+        }
 
+        private void sendMessage(LoginResult loginResult) {
+            Message message = Message.obtain();
 
+            Bundle messageBundle = new Bundle();
+
+            messageBundle.putString("authtoken", loginResult.getAuthtoken());
+            messageBundle.putString("username", loginResult.getUsername());
+            messageBundle.putString("personID", loginResult.getPersonID());
+
+            message.setData(messageBundle);
+
+            messageHandler.sendMessage(message);
         }
     }
 }

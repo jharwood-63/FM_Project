@@ -29,7 +29,6 @@ public class DataCache {
     private DataCache(){}
 
     private String authToken;
-    private User user;
     private Person userPerson;
 
     private final Map<String, Person> personById = new HashMap<>();
@@ -55,8 +54,6 @@ public class DataCache {
 
             sortEvents();
 
-            userPerson = findPerson(user.getPersonID());
-
             if (userPerson != null) {
                 Person father = findPerson(userPerson.getFatherID());
                 Person mother = findPerson(userPerson.getMotherID());
@@ -70,7 +67,7 @@ public class DataCache {
         }
         else {
             //FIXME: Do something with the message not just printing it out on the terminal
-            System.out.println("Error Messages: " + personResult.getMessage() + eventResult.getMessage());
+            System.out.println("Error Messages: " + personResult.getMessage() + " " + eventResult.getMessage());
         }
     }
 
@@ -159,16 +156,16 @@ public class DataCache {
         }
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
 
-    private void setPerson(Person person) {
-        this.userPerson = person;
+    public void setPerson(String personID) {
+        this.userPerson = findPerson(personID);
+    }
+
+    public Person getUserPerson() {
+        return this.userPerson;
     }
 
     public Map<String, Person> getPersonById() {

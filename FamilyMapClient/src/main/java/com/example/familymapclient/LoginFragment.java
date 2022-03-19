@@ -49,6 +49,10 @@ public class LoginFragment extends Fragment {
 
         EditText username = (EditText) view.findViewById(R.id.usernameField);
         EditText password = (EditText) view.findViewById(R.id.passwordField);
+        EditText email = (EditText) view.findViewById(R.id.emailField);
+        EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
+        EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
+        EditText gender = (EditText) view.findViewById(R.id.genderField);
 
         Button loginButton = view.findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -98,12 +102,18 @@ public class LoginFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText email = (EditText) view.findViewById(R.id.emailField);
-                EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
-                EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
-                EditText gender = (EditText) view.findViewById(R.id.genderField);
+                String usernameString = username.getText().toString();
+                String passwordString = password.getText().toString();
+                String emailString = email.getText().toString();
+                String firstNameString = firstName.getText().toString();
+                String lastNameString = lastName.getText().toString();
+                String genderString = gender.getText().toString();
+
+                UserRequest registerRequest = new RegisterRequest(usernameString, passwordString, emailString, firstNameString,
+                        lastNameString, genderString);
 
                 try {
+                    URL registerUrl = new URL(REGISTER_URL);
                     Handler uiThreadMessageHandler = new Handler() {
                         @Override
                         public void handleMessage(Message message) {
@@ -127,9 +137,6 @@ public class LoginFragment extends Fragment {
                         }
                     };
 
-                    UserRequest registerRequest = new RegisterRequest(username.getText().toString(), password.getText().toString(), email.getText().toString(),
-                            firstName.getText().toString(), lastName.getText().toString(), gender.getText().toString());
-                    URL registerUrl = new URL(REGISTER_URL);
                     LoginRegisterTask registerTask = new LoginRegisterTask(uiThreadMessageHandler, registerUrl, registerRequest);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.submit(registerTask);

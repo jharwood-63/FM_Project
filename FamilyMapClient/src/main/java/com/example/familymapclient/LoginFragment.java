@@ -28,8 +28,8 @@ import result.LoginResult;
 
 
 public class LoginFragment extends Fragment {
-    private static final String LOGIN_URL = "http://localhost:7979/user/login";
-    private static final String REGISTER_URL = "http://localhost:7979/user/register";
+    private static final String LOGIN_URL = "http://10.0.2.2:7979/user/login";
+    private static final String REGISTER_URL = "http://10.0.2.2:7979/user/register";
     private Listener listener;
 
     public interface Listener {
@@ -167,6 +167,7 @@ public class LoginFragment extends Fragment {
 
         @Override
         public void run() {
+            System.out.println("LoginTask");
             ServerProxy serverProxy = new ServerProxy();
             //create the request for either the login or the register
             //is the way im doing it gonna erase data?

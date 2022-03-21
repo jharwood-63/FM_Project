@@ -62,6 +62,7 @@ public class LoginFragment extends Fragment {
                     Handler uiThreadMessageHandler = new Handler() {
                         @Override
                         public void handleMessage(Message message) {
+                            /* FIXME: NOT READY FOR THIS YET
                             String toastString = "";
                             try {
                                 Bundle bundle = message.getData();
@@ -73,12 +74,12 @@ public class LoginFragment extends Fragment {
 
                                 dataCache.fillDataCache();
 
-                                toastString = person.getFirstName() + " " + person.getLastName();
+
+                                //toastString = person.getFirstName() + " " + person.getLastName();
                             } catch (IOException e) {
                                 toastString = "Error: Unable to fetch data from database";
-                            } finally {
-                                Toast.makeText(getActivity(), toastString, Toast.LENGTH_LONG).show();
                             }
+                             */
                         }
                     };
 

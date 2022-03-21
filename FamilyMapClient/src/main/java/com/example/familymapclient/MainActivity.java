@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public void notifyDone() {
+        Toast.makeText(this, "Test Toast", Toast.LENGTH_LONG).show();
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 

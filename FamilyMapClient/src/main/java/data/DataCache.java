@@ -31,7 +31,10 @@ public class DataCache {
     private DataCache(){}
 
     private String authToken;
-    private Person userPerson;
+    private String userPersonID;
+
+    private String personUrl;
+    private String eventUrl;
 
     private final Map<String, Person> personById = new HashMap<>();
     private final Map<String, Event> eventById = new HashMap<>();
@@ -53,25 +56,25 @@ public class DataCache {
         if (personResult.isSuccess() && eventResult.isSuccess()) {
             fillPersonById(personResult);
             fillEventById(eventResult);
+
+            Person userPerson = findPerson(userPersonID);
+
+            if (userPerson != null) {
+                Person father = findPerson(userPerson.getFatherID());
+                Person mother = findPerson(userPerson.getMotherID());
+
+                paternalMales.add(father.getPersonID());
+                maternalFemales.add(mother.getPersonID());
+
+                sortPersons(father, "paternal");
+                sortPersons(mother, "maternal");
+            }
+
+            sortEvents();
         }
         else {
             Log.e("Data Cache", "ERROR IN THE DATABASE");
         }
-    }
-
-    public void sort() {
-        if (userPerson != null) {
-            Person father = findPerson(userPerson.getFatherID());
-            Person mother = findPerson(userPerson.getMotherID());
-
-            paternalMales.add(father.getPersonID());
-            maternalFemales.add(mother.getPersonID());
-
-            sortPersons(father, "paternal");
-            sortPersons(mother, "maternal");
-        }
-
-        sortEvents();
     }
 
     private void fillPersonById(PersonResult personResult) {
@@ -159,16 +162,25 @@ public class DataCache {
         }
     }
 
+    public void setUrls(String serverHost, String serverPort) {
+        personUrl = "http://" + serverHost + ":" + serverPort + "/person";
+        eventUrl = "http://" + serverHost + ":" + serverPort + "/event";
+    }
+
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
 
-    public void setPerson(String personID) {
-        this.userPerson = findPerson(personID);
+    public void setPersonID(String personID) {
+        this.userPersonID = personID;
     }
 
-    public Person getUserPerson() {
-        return this.userPerson;
+    public String getPersonID() {
+        return this.userPersonID;
+    }
+
+    public Person getPerson(String personID) {
+        return findPerson(personID);
     }
 
     public Map<String, Person> getPersonById() {

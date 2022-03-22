@@ -28,8 +28,6 @@ import result.LoginResult;
 
 
 public class LoginFragment extends Fragment {
-    private static final String LOGIN_URL = "http://10.0.2.2:7979/user/login";
-    private static final String REGISTER_URL = "http://10.0.2.2:7979/user/register";
     private Listener listener;
 
     public interface Listener {
@@ -47,6 +45,9 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         //Create another listener that works with the register button
 
+        EditText serverHost = (EditText) view.findViewById(R.id.serverHostField);
+        EditText serverPort = (EditText) view.findViewById(R.id.serverPortField);
+
         EditText username = (EditText) view.findViewById(R.id.usernameField);
         EditText password = (EditText) view.findViewById(R.id.passwordField);
         EditText email = (EditText) view.findViewById(R.id.emailField);
@@ -58,25 +59,30 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DataCache dataCache = DataCache.getInstance();
+                dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
+
                 Handler uiThreadMessageHandler = new Handler() {
                     @Override
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
                         if (bundle.getBoolean("success")) {
-                            DataCache dataCache = DataCache.getInstance();
-                            dataCache.setPerson(bundle.getString("personID"));
+                            if (listener != null) {
+                                listener.notifyDone();
+                            }
                         }
-
-                        if (listener != null) {
-                            listener.notifyDone();
+                        else {
+                            Toast.makeText(getActivity(), "Login failed", Toast.LENGTH_LONG).show();
                         }
                     }
                 };
 
                 try {
                     UserRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
-                    URL loginUrl = new URL(LOGIN_URL);
+                    String urlString = getUrl(getString(R.string.login_url), serverHost.getText().toString(), serverPort.getText().toString());
+
+                    URL loginUrl = new URL(urlString);
                     LoginRegisterTask loginTask = new LoginRegisterTask(uiThreadMessageHandler, loginUrl, loginRequest);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.submit(loginTask);
@@ -91,14 +97,21 @@ public class LoginFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DataCache dataCache = DataCache.getInstance();
+                dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
+
                 Handler uiThreadMessageHandler = new Handler() {
                     @Override
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
                         if (bundle.getBoolean("success")) {
-                            DataCache dataCache = DataCache.getInstance();
-                            dataCache.setPerson(bundle.getString("personID"));
+                            if (listener != null) {
+                                listener.notifyDone();
+                            }
+                        }
+                        else {
+                            Toast.makeText(getActivity(), "Login failed", Toast.LENGTH_LONG).show();
                         }
                     }
                 };
@@ -112,16 +125,13 @@ public class LoginFragment extends Fragment {
 
                 UserRequest registerRequest = new RegisterRequest(usernameString, passwordString, emailString, firstNameString,
                         lastNameString, genderString);
+                String urlString = getUrl(getString(R.string.register_url), serverHost.getText().toString(), serverPort.getText().toString());
 
                 try {
-                    URL registerUrl = new URL(REGISTER_URL);
+                    URL registerUrl = new URL(urlString);
                     LoginRegisterTask registerTask = new LoginRegisterTask(uiThreadMessageHandler, registerUrl, registerRequest);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.submit(registerTask);
-
-                    if (listener != null) {
-                        listener.notifyDone();
-                    }
                 }
                 catch (IOException e) {
                     Log.e("Login Fragment", e.getMessage(), e);
@@ -130,6 +140,10 @@ public class LoginFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private String getUrl(String endPoint, String serverHost, String serverPort) {
+        return "http://" + serverHost + ":" + serverPort + endPoint;
     }
 
     private static class LoginRegisterTask implements Runnable {
@@ -152,7 +166,7 @@ public class LoginFragment extends Fragment {
                 if (loginRegisterResult.isSuccess()) {
                     DataCache dataCache = DataCache.getInstance();
                     dataCache.setAuthToken(loginRegisterResult.getAuthtoken());
-                    dataCache.fillDataCache();
+                    dataCache.setPersonID(loginRegisterResult.getPersonID());
                 }
                 sendMessage(loginRegisterResult);
             }
@@ -167,11 +181,6 @@ public class LoginFragment extends Fragment {
             Bundle messageBundle = new Bundle();
 
             messageBundle.putBoolean("success", loginResult.isSuccess());
-            if (loginResult.isSuccess()) {
-                messageBundle.putString("authtoken", loginResult.getAuthtoken());
-                messageBundle.putString("username", loginResult.getUsername());
-                messageBundle.putString("personID", loginResult.getPersonID());
-            }
 
             message.setData(messageBundle);
 

@@ -51,61 +51,66 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public void notifyDone() {
-        DataCache dataCache = DataCache.getInstance();
-
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 
-        Person person = dataCache.getUserPerson();
-        if (person != null) {
-            String toastString = person.getFirstName() + " " + person.getLastName();
-            Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragmentFrameLayout, fragment)
+                .commit();
 
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragmentFrameLayout, fragment)
-                    .commit();
+        Handler uiThreadMessageHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                Bundle bundle = message.getData();
 
-            Handler uiThreadMessageHandler = new Handler() {
-                @Override
-                public void handleMessage(Message message) {
-                    Bundle bundle = message.getData();
+                Toast.makeText(MainActivity.this, bundle.getString("message"), Toast.LENGTH_SHORT).show();
+            }
+        };
 
-                    //Toast.makeText(MainActivity.this, bundle.getString("message"), Toast.LENGTH_SHORT).show();
-                }
-            };
-
-            SortDataTask sortDataTask = new SortDataTask(uiThreadMessageHandler);
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(sortDataTask);
-        }
-        else {
-            Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
-        }
+        FillDataTask fillDataTask = new FillDataTask(uiThreadMessageHandler);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(fillDataTask);
     }
 
-    private static class SortDataTask implements Runnable {
+    private static class FillDataTask implements Runnable {
         private final Handler messageHandler;
 
-        public SortDataTask(Handler messageHandler) {
+        public FillDataTask(Handler messageHandler) {
             this.messageHandler = messageHandler;
         }
 
         @Override
         public void run() {
             DataCache dataCache = DataCache.getInstance();
-            dataCache.sort();
-            sendMessage();
+            Person person = null;
+            try {
+                dataCache.fillDataCache();
+
+                String personID = dataCache.getPersonID();
+
+                person = dataCache.getPerson(personID);
+            }
+            catch (IOException e) {
+                Log.e("Main Activity", "IOException");
+            }
+
+            sendMessage(person);
         }
 
-        private void sendMessage() {
+        private void sendMessage(Person person) {
             Message message = Message.obtain();
-
             Bundle messageBundle = new Bundle();
 
-            messageBundle.putString("message","User data sorted");
+            String toastString = "";
+            if (person != null) {
+                toastString = person.getFirstName() + " " + person.getLastName();
+            }
+            else {
+                toastString = "Unable to fillDataCache";
+            }
 
+            messageBundle.putString("message", toastString);
             message.setData(messageBundle);
-
             messageHandler.sendMessage(message);
         }
     }

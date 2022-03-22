@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.text.TextWatcher;
 import android.widget.RadioButton;
@@ -56,12 +57,15 @@ public class LoginFragment extends Fragment {
         EditText email = (EditText) view.findViewById(R.id.emailField);
         EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
         EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
+        RadioGroup genderRadio = (RadioGroup) view.findViewById(R.id.radio_group);
         //Gender
 
         Button loginButton = view.findViewById(R.id.loginButton);
         Button registerButton = view.findViewById(R.id.registerButton);
 
-        serverHost.addTextChangedListener(new TextWatcher() {
+        //your gonna need this for every edit text
+
+        password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
 
@@ -80,14 +84,24 @@ public class LoginFragment extends Fragment {
             public void afterTextChanged(Editable editable) {/*Do nothing*/}
         });
 
-        email.addTextChangedListener(new TextWatcher() {
+        genderRadio.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+            public void onClick(View view) {
+                boolean checked = ((RadioButton) view).isChecked();
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                boolean isRegister = isRegister(email.getText().toString(), firstName.getText().toString(), lastName.getText().toString()) &&
-                        isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+                switch(view.getId()) {
+                    case R.id.radio_male:
+                        if (checked)
+                            gender = "m";
+                        break;
+                    case R.id.radio_female:
+                        if (checked)
+                            gender = "f";
+                        break;
+                }
+
+                boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
                 if (isRegister) {
                     registerButton.setEnabled(true);
@@ -96,9 +110,6 @@ public class LoginFragment extends Fragment {
                     registerButton.setEnabled(false);
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable editable) {/*Do nothing*/}
         });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -193,23 +204,8 @@ public class LoginFragment extends Fragment {
         return !serverHost.equals("") && !serverPort.equals("") && !username.equals("") && !password.equals("");
     }
 
-    private boolean isRegister(String email, String firstName, String lastName) {
-        return !email.equals("") && !firstName.equals("") && !lastName.equals("");
-    }
-
-    public void onRadioButtonClicked(View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-
-        switch(view.getId()) {
-            case R.id.radio_male:
-                if (checked)
-                    gender = "m";
-                    break;
-            case R.id.radio_female:
-                if (checked)
-                    gender = "f";
-                    break;
-        }
+    private boolean isRegister(String serverHost, String serverPort, String username, String password, String email, String firstName, String lastName, String gender) {
+        return !email.equals("") && !firstName.equals("") && !lastName.equals("") && !gender.equals("") && isLogin(serverHost, serverPort, username, password);
     }
 
     private static class LoginRegisterTask implements Runnable {

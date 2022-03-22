@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.text.TextWatcher;
+import android.widget.RadioButton;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import data.DataCache;
-import model.Person;
 import requests.LoginRequest;
 import requests.RegisterRequest;
 import requests.UserRequest;
@@ -29,6 +31,7 @@ import result.LoginResult;
 
 public class LoginFragment extends Fragment {
     private Listener listener;
+    private String gender;
 
     public interface Listener {
         void notifyDone();
@@ -53,9 +56,51 @@ public class LoginFragment extends Fragment {
         EditText email = (EditText) view.findViewById(R.id.emailField);
         EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
         EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
-        EditText gender = (EditText) view.findViewById(R.id.genderField);
+        //Gender
 
         Button loginButton = view.findViewById(R.id.loginButton);
+        Button registerButton = view.findViewById(R.id.registerButton);
+
+        serverHost.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+                if (isLogin) {
+                    loginButton.setEnabled(true);
+                }
+                else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        email.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isRegister = isRegister(email.getText().toString(), firstName.getText().toString(), lastName.getText().toString()) &&
+                        isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+
+                if (isRegister) {
+                    registerButton.setEnabled(true);
+                }
+                else {
+                    registerButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,7 +138,6 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        Button registerButton = view.findViewById(R.id.registerButton);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,10 +165,9 @@ public class LoginFragment extends Fragment {
                 String emailString = email.getText().toString();
                 String firstNameString = firstName.getText().toString();
                 String lastNameString = lastName.getText().toString();
-                String genderString = gender.getText().toString();
 
                 UserRequest registerRequest = new RegisterRequest(usernameString, passwordString, emailString, firstNameString,
-                        lastNameString, genderString);
+                        lastNameString, gender);
                 String urlString = getUrl(getString(R.string.register_url), serverHost.getText().toString(), serverPort.getText().toString());
 
                 try {
@@ -144,6 +187,29 @@ public class LoginFragment extends Fragment {
 
     private String getUrl(String endPoint, String serverHost, String serverPort) {
         return "http://" + serverHost + ":" + serverPort + endPoint;
+    }
+
+    private boolean isLogin(String serverHost, String serverPort, String username, String password) {
+        return !serverHost.equals("") && !serverPort.equals("") && !username.equals("") && !password.equals("");
+    }
+
+    private boolean isRegister(String email, String firstName, String lastName) {
+        return !email.equals("") && !firstName.equals("") && !lastName.equals("");
+    }
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch(view.getId()) {
+            case R.id.radio_male:
+                if (checked)
+                    gender = "m";
+                    break;
+            case R.id.radio_female:
+                if (checked)
+                    gender = "f";
+                    break;
+        }
     }
 
     private static class LoginRegisterTask implements Runnable {

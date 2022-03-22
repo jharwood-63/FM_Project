@@ -119,13 +119,21 @@
             android:layout_width="wrap_content"
             android:gravity="end"
             android:text="@string/gender"/>
-        <EditText
-            android:id="@+id/genderField"
-            android:layout_width="wrap_content"
+        <RadioGroup
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_span="3"
-            android:inputType="textPersonName"
-            tools:text="M/F"/>
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radio_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/male_button" />
+            <RadioButton
+                android:id="@+id/radio_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/female_button"/>
+        </RadioGroup>
     </TableRow>
 
     <LinearLayout
@@ -138,12 +146,14 @@
             android:id="@+id/registerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="@string/register_button" />
 
         <Button
             android:id="@+id/loginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="@string/login_button" />
     </LinearLayout>
 </TableLayout>

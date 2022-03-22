@@ -5,7 +5,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.io.IOException;
+
+import data.DataCache;
+import model.Person;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
 
@@ -38,12 +44,24 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public void notifyDone() {
-        Toast.makeText(this, "Test Toast", Toast.LENGTH_LONG).show();
+        DataCache dataCache = DataCache.getInstance();
+
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragmentFrameLayout, fragment)
-                .commit();
+        String toastString = "";
+        Person person = dataCache.getUserPerson();
+        if (person != null) {
+            toastString = person.getFirstName() + " " + person.getLastName();
+
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragmentFrameLayout, fragment)
+                    .commit();
+        }
+        else {
+            toastString = "Login/Register failed";
+        }
+
+        Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
     }
 }

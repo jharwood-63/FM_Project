@@ -58,31 +58,26 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    Handler uiThreadMessageHandler = new Handler() {
-                        @Override
-                        public void handleMessage(Message message) {
-                            /* FIXME: NOT READY FOR THIS YET
-                            String toastString = "";
-                            try {
-                                Bundle bundle = message.getData();
+                Handler uiThreadMessageHandler = new Handler() {
+                    @Override
+                    public void handleMessage(Message message) {
+                        Bundle bundle = message.getData();
 
+                        try {
+                            if (bundle.getBoolean("success")) {
                                 DataCache dataCache = DataCache.getInstance();
-                                dataCache.setAuthToken(bundle.getString("authtoken"));
                                 dataCache.setPerson(bundle.getString("personID"));
-                                Person person = dataCache.getUserPerson();
 
                                 dataCache.fillDataCache();
-
-
-                                //toastString = person.getFirstName() + " " + person.getLastName();
-                            } catch (IOException e) {
-                                toastString = "Error: Unable to fetch data from database";
                             }
-                             */
                         }
-                    };
+                        catch (IOException e) {
+                            Log.e("Login Fragment", e.getMessage(), e);
+                        }
+                    }
+                };
 
+                try {
                     UserRequest loginRequest = new LoginRequest(username.getText().toString(), password.getText().toString());
                     URL loginUrl = new URL(LOGIN_URL);
                     LoginRegisterTask loginTask = new LoginRegisterTask(uiThreadMessageHandler, loginUrl, loginRequest);
@@ -103,6 +98,25 @@ public class LoginFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Handler uiThreadMessageHandler = new Handler() {
+                    @Override
+                    public void handleMessage(Message message) {
+                        Bundle bundle = message.getData();
+
+                        try {
+                            if (bundle.getBoolean("success")) {
+                                DataCache dataCache = DataCache.getInstance();
+                                dataCache.setPerson(bundle.getString("personID"));
+
+                                dataCache.fillDataCache();
+                            }
+                        }
+                        catch (IOException e) {
+                            Log.e("Login Fragment", e.getMessage(), e);
+                        }
+                    }
+                };
+
                 String usernameString = username.getText().toString();
                 String passwordString = password.getText().toString();
                 String emailString = email.getText().toString();
@@ -115,29 +129,6 @@ public class LoginFragment extends Fragment {
 
                 try {
                     URL registerUrl = new URL(REGISTER_URL);
-                    Handler uiThreadMessageHandler = new Handler() {
-                        @Override
-                        public void handleMessage(Message message) {
-                            String toastString = "";
-                            try {
-                                Bundle bundle = message.getData();
-
-                                DataCache dataCache = DataCache.getInstance();
-                                dataCache.setAuthToken(bundle.getString("authtoken"));
-                                dataCache.setPerson(bundle.getString("personID"));
-                                Person person = dataCache.getUserPerson();
-
-                                dataCache.fillDataCache();
-
-                                toastString = person.getFirstName() + " " + person.getLastName();
-                            } catch (IOException e) {
-                                toastString = "Error: Unable to fetch data from database";
-                            } finally {
-                                Toast.makeText(getActivity(), toastString, Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    };
-
                     LoginRegisterTask registerTask = new LoginRegisterTask(uiThreadMessageHandler, registerUrl, registerRequest);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.submit(registerTask);
@@ -168,7 +159,6 @@ public class LoginFragment extends Fragment {
 
         @Override
         public void run() {
-            System.out.println("LoginTask");
             ServerProxy serverProxy = new ServerProxy();
             //create the request for either the login or the register
             //is the way im doing it gonna erase data?
@@ -177,13 +167,15 @@ public class LoginFragment extends Fragment {
 
             try {
                 loginRegisterResult = (LoginResult) serverProxy.doPost(url, userRequest);
+                if (loginRegisterResult.isSuccess()) {
+                    DataCache dataCache = DataCache.getInstance();
+                    dataCache.setAuthToken(loginRegisterResult.getAuthtoken());
+                    dataCache.fillDataCache();
+                }
+                sendMessage(loginRegisterResult);
             }
             catch (IOException e) {
-                //do something with this but you can't throw it
-                //maybe put something in the bundle to say there was an error and then deal with it somewhere else
-            }
-            finally {
-                sendMessage(loginRegisterResult);
+                Log.e("Login task", e.getMessage(), e);
             }
         }
 
@@ -192,9 +184,12 @@ public class LoginFragment extends Fragment {
 
             Bundle messageBundle = new Bundle();
 
-            messageBundle.putString("authtoken", loginResult.getAuthtoken());
-            messageBundle.putString("username", loginResult.getUsername());
-            messageBundle.putString("personID", loginResult.getPersonID());
+            messageBundle.putBoolean("success", loginResult.isSuccess());
+            if (loginResult.isSuccess()) {
+                messageBundle.putString("authtoken", loginResult.getAuthtoken());
+                messageBundle.putString("username", loginResult.getUsername());
+                messageBundle.putString("personID", loginResult.getPersonID());
+            }
 
             message.setData(messageBundle);
 

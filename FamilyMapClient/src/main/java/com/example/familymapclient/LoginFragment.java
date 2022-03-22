@@ -63,16 +63,13 @@ public class LoginFragment extends Fragment {
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
-                        try {
-                            if (bundle.getBoolean("success")) {
-                                DataCache dataCache = DataCache.getInstance();
-                                dataCache.setPerson(bundle.getString("personID"));
-
-                                dataCache.fillDataCache();
-                            }
+                        if (bundle.getBoolean("success")) {
+                            DataCache dataCache = DataCache.getInstance();
+                            dataCache.setPerson(bundle.getString("personID"));
                         }
-                        catch (IOException e) {
-                            Log.e("Login Fragment", e.getMessage(), e);
+
+                        if (listener != null) {
+                            listener.notifyDone();
                         }
                     }
                 };
@@ -83,10 +80,6 @@ public class LoginFragment extends Fragment {
                     LoginRegisterTask loginTask = new LoginRegisterTask(uiThreadMessageHandler, loginUrl, loginRequest);
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.submit(loginTask);
-
-                    if (listener != null) {
-                        listener.notifyDone();
-                    }
                 }
                 catch (IOException e) {
                     Log.e("Login Fragment", e.getMessage(), e);
@@ -103,16 +96,9 @@ public class LoginFragment extends Fragment {
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
-                        try {
-                            if (bundle.getBoolean("success")) {
-                                DataCache dataCache = DataCache.getInstance();
-                                dataCache.setPerson(bundle.getString("personID"));
-
-                                dataCache.fillDataCache();
-                            }
-                        }
-                        catch (IOException e) {
-                            Log.e("Login Fragment", e.getMessage(), e);
+                        if (bundle.getBoolean("success")) {
+                            DataCache dataCache = DataCache.getInstance();
+                            dataCache.setPerson(bundle.getString("personID"));
                         }
                     }
                 };
@@ -160,13 +146,9 @@ public class LoginFragment extends Fragment {
         @Override
         public void run() {
             ServerProxy serverProxy = new ServerProxy();
-            //create the request for either the login or the register
-            //is the way im doing it gonna erase data?
-
-            LoginResult loginRegisterResult = null;
 
             try {
-                loginRegisterResult = (LoginResult) serverProxy.doPost(url, userRequest);
+                LoginResult loginRegisterResult = (LoginResult) serverProxy.doPost(url, userRequest);
                 if (loginRegisterResult.isSuccess()) {
                     DataCache dataCache = DataCache.getInstance();
                     dataCache.setAuthToken(loginRegisterResult.getAuthtoken());

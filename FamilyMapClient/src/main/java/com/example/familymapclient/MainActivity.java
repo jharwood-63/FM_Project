@@ -5,13 +5,20 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import data.DataCache;
 import model.Person;
+import requests.UserRequest;
+import result.LoginResult;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
 
@@ -49,19 +56,57 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 
-        String toastString = "";
         Person person = dataCache.getUserPerson();
         if (person != null) {
-            toastString = person.getFirstName() + " " + person.getLastName();
+            String toastString = person.getFirstName() + " " + person.getLastName();
+            Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
 
             fragmentManager.beginTransaction()
                     .replace(R.id.fragmentFrameLayout, fragment)
                     .commit();
+
+            Handler uiThreadMessageHandler = new Handler() {
+                @Override
+                public void handleMessage(Message message) {
+                    Bundle bundle = message.getData();
+
+                    //Toast.makeText(MainActivity.this, bundle.getString("message"), Toast.LENGTH_SHORT).show();
+                }
+            };
+
+            SortDataTask sortDataTask = new SortDataTask(uiThreadMessageHandler);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(sortDataTask);
         }
         else {
-            toastString = "Login/Register failed";
+            Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private static class SortDataTask implements Runnable {
+        private final Handler messageHandler;
+
+        public SortDataTask(Handler messageHandler) {
+            this.messageHandler = messageHandler;
         }
 
-        Toast.makeText(this, toastString, Toast.LENGTH_LONG).show();
+        @Override
+        public void run() {
+            DataCache dataCache = DataCache.getInstance();
+            dataCache.sort();
+            sendMessage();
+        }
+
+        private void sendMessage() {
+            Message message = Message.obtain();
+
+            Bundle messageBundle = new Bundle();
+
+            messageBundle.putString("message","User data sorted");
+
+            message.setData(messageBundle);
+
+            messageHandler.sendMessage(message);
+        }
     }
 }

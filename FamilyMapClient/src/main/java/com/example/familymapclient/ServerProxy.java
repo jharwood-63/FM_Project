@@ -12,7 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import requests.UserRequest;
+import result.EventResult;
 import result.LoginResult;
+import result.PersonResult;
 import result.Result;
 
 public class ServerProxy {
@@ -23,19 +25,26 @@ public class ServerProxy {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.setReadTimeout(5000);
-            connection.setRequestMethod("GET");
             connection.setDoOutput(true);
             connection.addRequestProperty("Authorization", authToken);
-            connection.connect();
+            connection.setRequestMethod("GET");
 
-            return getResult(connection);
+            Result result = null;
+            if (urlString.contains("person")) {
+                result = (PersonResult) getResult(connection, "person");
+            }
+            else if (urlString.contains("event")) {
+                result = (EventResult) getResult(connection, "event");
+            }
+
+            return result;
         }
         catch (IOException e) {
             throw new IOException("Error: unable to get data from database");
         }
     }
 
-    public LoginResult doPost(URL url, UserRequest userRequest) throws IOException {
+    public Result doPost(URL url, UserRequest userRequest) throws IOException {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -54,7 +63,7 @@ public class ServerProxy {
                 dos.flush();
             }
 
-            LoginResult result = (LoginResult) getResult(connection);
+            Result result = (LoginResult) getResult(connection, "login");
 
             return result;
         }
@@ -64,10 +73,25 @@ public class ServerProxy {
 
     }
 
-    private LoginResult getResult(HttpURLConnection connection) throws IOException {
+    private Result getResult(HttpURLConnection connection, String resultType) throws IOException {
         Gson gson = new Gson();
         InputStream inputStream = connection.getInputStream();
         Reader respBody = new InputStreamReader(inputStream);
-        return gson.fromJson(respBody, LoginResult.class);
+
+        Result result = null;
+
+        switch (resultType) {
+            case "login":
+                result = (LoginResult) gson.fromJson(respBody, LoginResult.class);
+                break;
+            case "person":
+                result = (PersonResult) gson.fromJson(respBody, PersonResult.class);
+                break;
+            case "event":
+                result = (EventResult) gson.fromJson(respBody, EventResult.class);
+                break;
+        }
+
+        return result;
     }
 }

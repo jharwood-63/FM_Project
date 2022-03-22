@@ -1,5 +1,7 @@
 package data;
 
+import android.util.Log;
+
 import com.example.familymapclient.ServerProxy;
 
 import java.io.IOException;
@@ -51,24 +53,25 @@ public class DataCache {
         if (personResult.isSuccess() && eventResult.isSuccess()) {
             fillPersonById(personResult);
             fillEventById(eventResult);
-
-            sortEvents();
-
-            if (userPerson != null) {
-                Person father = findPerson(userPerson.getFatherID());
-                Person mother = findPerson(userPerson.getMotherID());
-
-                paternalMales.add(father.getPersonID());
-                maternalFemales.add(mother.getPersonID());
-
-                sortPersons(father, "paternal");
-                sortPersons(mother, "maternal");
-            }
         }
         else {
-            //FIXME: Do something with the message not just printing it out on the terminal
-            System.out.println("Error Messages: " + personResult.getMessage() + " " + eventResult.getMessage());
+            Log.e("Data Cache", "ERROR IN THE DATABASE");
         }
+    }
+
+    public void sort() {
+        if (userPerson != null) {
+            Person father = findPerson(userPerson.getFatherID());
+            Person mother = findPerson(userPerson.getMotherID());
+
+            paternalMales.add(father.getPersonID());
+            maternalFemales.add(mother.getPersonID());
+
+            sortPersons(father, "paternal");
+            sortPersons(mother, "maternal");
+        }
+
+        sortEvents();
     }
 
     private void fillPersonById(PersonResult personResult) {

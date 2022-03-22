@@ -18,7 +18,7 @@ public class PersonHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         System.out.println("PersonHandler");
         try {
-            if (exchange.getRequestMethod().toUpperCase().equals("GET")) {
+            if (exchange.getRequestMethod().toUpperCase().equals("POST")) {
                 Gson gson = new Gson();
                 Utility utility = new Utility();
                 Headers reqHeaders = exchange.getRequestHeaders();

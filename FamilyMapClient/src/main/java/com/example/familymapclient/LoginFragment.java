@@ -45,9 +45,7 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
-        //Create another listener that works with the register button
 
         EditText serverHost = (EditText) view.findViewById(R.id.serverHostField);
         EditText serverPort = (EditText) view.findViewById(R.id.serverPortField);
@@ -58,12 +56,66 @@ public class LoginFragment extends Fragment {
         EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
         EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
         RadioGroup genderRadio = (RadioGroup) view.findViewById(R.id.radio_group);
-        //Gender
 
         Button loginButton = view.findViewById(R.id.loginButton);
         Button registerButton = view.findViewById(R.id.registerButton);
 
-        //your gonna need this for every edit text
+        serverHost.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+                if (isLogin) {
+                    loginButton.setEnabled(true);
+                }
+                else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        serverPort.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+                if (isLogin) {
+                    loginButton.setEnabled(true);
+                }
+                else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        username.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
+                if (isLogin) {
+                    loginButton.setEnabled(true);
+                }
+                else {
+                    loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
 
         password.addTextChangedListener(new TextWatcher() {
             @Override
@@ -77,6 +129,69 @@ public class LoginFragment extends Fragment {
                 }
                 else {
                     loginButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        email.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+
+                if (isRegister) {
+                    registerButton.setEnabled(true);
+                }
+                else {
+                    registerButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        firstName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+
+                if (isRegister) {
+                    registerButton.setEnabled(true);
+                }
+                else {
+                    registerButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {/*Do nothing*/}
+        });
+
+        lastName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {/*Do nothing*/}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+
+                if (isRegister) {
+                    registerButton.setEnabled(true);
+                }
+                else {
+                    registerButton.setEnabled(false);
                 }
             }
 
@@ -205,7 +320,19 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean isRegister(String serverHost, String serverPort, String username, String password, String email, String firstName, String lastName, String gender) {
-        return !email.equals("") && !firstName.equals("") && !lastName.equals("") && !gender.equals("") && isLogin(serverHost, serverPort, username, password);
+        if (!hasNullComponents(serverHost, serverPort, username, password, email, firstName, lastName, gender)) {
+            return !email.equals("") && !firstName.equals("") && !lastName.equals("") && !gender.equals("") && isLogin(serverHost, serverPort, username, password);
+        }
+
+        return false;
+    }
+
+    private boolean hasNullComponents(String serverHost, String serverPort, String username, String password, String email, String firstName, String lastName, String gender) {
+        if (serverHost == null || serverPort == null || username == null || password == null || email == null || firstName == null || lastName == null || gender == null) {
+            return true;
+        }
+
+        return false;
     }
 
     private static class LoginRegisterTask implements Runnable {

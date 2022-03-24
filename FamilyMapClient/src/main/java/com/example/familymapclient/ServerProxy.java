@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,20 +53,16 @@ public class ServerProxy {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
+            connection.addRequestProperty("Accept", "application/json");
+
             connection.connect();
 
-            try (OutputStream requestBody = connection.getOutputStream()) {
-                DataOutputStream dos = new DataOutputStream(requestBody);
-                Gson gson = new Gson();
-                String requestString = gson.toJson(userRequest);
+            OutputStreamWriter requestBody = new OutputStreamWriter(connection.getOutputStream());
+            Gson gson = new Gson();
+            gson.toJson(userRequest, requestBody);
+            requestBody.close();
 
-                dos.writeBytes(requestString);
-                dos.flush();
-            }
-
-            Result result = (LoginResult) getResult(connection, "login");
-
-            return result;
+            return getResult(connection, "login");
         }
         catch (IOException e) {
             throw new IOException("Error: unable to perform post");
@@ -75,21 +72,28 @@ public class ServerProxy {
 
     private Result getResult(HttpURLConnection connection, String resultType) throws IOException {
         Gson gson = new Gson();
-        InputStream inputStream = connection.getInputStream();
-        Reader respBody = new InputStreamReader(inputStream);
+        Reader respBody;
 
         Result result = null;
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            respBody = new InputStreamReader(connection.getInputStream());
 
-        switch (resultType) {
-            case "login":
-                result = (LoginResult) gson.fromJson(respBody, LoginResult.class);
-                break;
-            case "person":
-                result = (PersonResult) gson.fromJson(respBody, PersonResult.class);
-                break;
-            case "event":
-                result = (EventResult) gson.fromJson(respBody, EventResult.class);
-                break;
+            switch (resultType) {
+                case "login":
+                    result = (LoginResult) gson.fromJson(respBody, LoginResult.class);
+                    break;
+                case "person":
+                    result = (PersonResult) gson.fromJson(respBody, PersonResult.class);
+                    break;
+                case "event":
+                    result = (EventResult) gson.fromJson(respBody, EventResult.class);
+                    break;
+            }
+        }
+        else {
+            respBody = new InputStreamReader(connection.getErrorStream());
+
+            result = (Result) gson.fromJson(respBody, Result.class);
         }
 
         return result;

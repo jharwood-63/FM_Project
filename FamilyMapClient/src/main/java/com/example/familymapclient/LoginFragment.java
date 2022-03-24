@@ -13,10 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import android.text.TextWatcher;
-import android.widget.RadioButton;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,10 +23,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import data.DataCache;
+import model.Person;
 import requests.LoginRequest;
 import requests.RegisterRequest;
 import requests.UserRequest;
 import result.LoginResult;
+import result.Result;
 
 
 public class LoginFragment extends Fragment {
@@ -47,6 +48,8 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
+        DataCache dataCache = DataCache.getInstance();
+
         EditText serverHost = (EditText) view.findViewById(R.id.serverHostField);
         EditText serverPort = (EditText) view.findViewById(R.id.serverPortField);
 
@@ -55,7 +58,8 @@ public class LoginFragment extends Fragment {
         EditText email = (EditText) view.findViewById(R.id.emailField);
         EditText firstName = (EditText) view.findViewById(R.id.firstNameField);
         EditText lastName = (EditText) view.findViewById(R.id.lastNameField);
-        RadioGroup genderRadio = (RadioGroup) view.findViewById(R.id.radio_group);
+        RadioButton maleButton = (RadioButton) view.findViewById(R.id.radio_male);
+        RadioButton femaleButton = (RadioButton) view.findViewById(R.id.radio_female);
 
         Button loginButton = view.findViewById(R.id.loginButton);
         Button registerButton = view.findViewById(R.id.registerButton);
@@ -199,7 +203,35 @@ public class LoginFragment extends Fragment {
             public void afterTextChanged(Editable editable) {/*Do nothing*/}
         });
 
-        genderRadio.setOnClickListener(new View.OnClickListener() {
+        maleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean checked = ((RadioButton) view).isChecked();
+
+                switch(view.getId()) {
+                    case R.id.radio_male:
+                        if (checked)
+                            gender = "m";
+                        break;
+                    case R.id.radio_female:
+                        if (checked)
+                            gender = "f";
+                        break;
+                }
+
+                boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
+                        email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
+
+                if (isRegister) {
+                    registerButton.setEnabled(true);
+                }
+                else {
+                    registerButton.setEnabled(false);
+                }
+            }
+        });
+
+        femaleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 boolean checked = ((RadioButton) view).isChecked();
@@ -230,22 +262,13 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DataCache dataCache = DataCache.getInstance();
                 dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
-
                 Handler uiThreadMessageHandler = new Handler() {
                     @Override
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
-                        if (bundle.getBoolean("success")) {
-                            if (listener != null) {
-                                listener.notifyDone();
-                            }
-                        }
-                        else {
-                            Toast.makeText(getActivity(), "Login failed", Toast.LENGTH_LONG).show();
-                        }
+                        handleResult(bundle);
                     }
                 };
 
@@ -267,7 +290,6 @@ public class LoginFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DataCache dataCache = DataCache.getInstance();
                 dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
 
                 Handler uiThreadMessageHandler = new Handler() {
@@ -275,14 +297,7 @@ public class LoginFragment extends Fragment {
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
 
-                        if (bundle.getBoolean("success")) {
-                            if (listener != null) {
-                                listener.notifyDone();
-                            }
-                        }
-                        else {
-                            Toast.makeText(getActivity(), "Login failed", Toast.LENGTH_LONG).show();
-                        }
+                        handleResult(bundle);
                     }
                 };
 
@@ -311,6 +326,20 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
+    private void handleResult(Bundle bundle) {
+        if (bundle.getBoolean("success")) {
+            Toast.makeText(getActivity(), bundle.getString("message"), Toast.LENGTH_LONG).show();
+            if (listener != null) {
+                listener.notifyDone();
+            }
+        }
+        else {
+            System.out.println("Failed login toast");
+            Log.i("handleResult", "Failed login toast");
+            Toast.makeText(getActivity(), bundle.getString("message"), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private String getUrl(String endPoint, String serverHost, String serverPort) {
         return "http://" + serverHost + ":" + serverPort + endPoint;
     }
@@ -328,12 +357,10 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean hasNullComponents(String serverHost, String serverPort, String username, String password, String email, String firstName, String lastName, String gender) {
-        if (serverHost == null || serverPort == null || username == null || password == null || email == null || firstName == null || lastName == null || gender == null) {
-            return true;
-        }
-
-        return false;
+        return serverHost == null || serverPort == null || username == null || password == null || email == null || firstName == null || lastName == null || gender == null;
     }
+
+
 
     private static class LoginRegisterTask implements Runnable {
         private final Handler messageHandler;
@@ -351,25 +378,38 @@ public class LoginFragment extends Fragment {
             ServerProxy serverProxy = new ServerProxy();
 
             try {
-                LoginResult loginRegisterResult = (LoginResult) serverProxy.doPost(url, userRequest);
-                if (loginRegisterResult.isSuccess()) {
+                Result result = serverProxy.doPost(url, userRequest);
+                if (result.isSuccess()) {
+                    LoginResult loginResult = (LoginResult) result;
                     DataCache dataCache = DataCache.getInstance();
-                    dataCache.setAuthToken(loginRegisterResult.getAuthtoken());
-                    dataCache.setPersonID(loginRegisterResult.getPersonID());
+                    dataCache.setAuthToken(loginResult.getAuthtoken());
+                    dataCache.setPersonID(loginResult.getPersonID());
+                    dataCache.fillDataCache();
                 }
-                sendMessage(loginRegisterResult);
+                sendMessage(result);
             }
             catch (IOException e) {
                 Log.e("Login task", e.getMessage(), e);
             }
         }
 
-        private void sendMessage(LoginResult loginResult) {
+        private void sendMessage(Result result) {
+            DataCache dataCache = DataCache.getInstance();
+
             Message message = Message.obtain();
 
             Bundle messageBundle = new Bundle();
 
-            messageBundle.putBoolean("success", loginResult.isSuccess());
+            messageBundle.putBoolean("success", result.isSuccess());
+
+            if (!result.isSuccess()) {
+                messageBundle.putString("message", result.getMessage());
+            }
+            else {
+                Person person = dataCache.getPerson(dataCache.getPersonID());
+                String personString = person.getFirstName() + " " + person.getLastName();
+                messageBundle.putString("message", personString);
+            }
 
             message.setData(messageBundle);
 

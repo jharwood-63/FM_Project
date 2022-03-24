@@ -50,8 +50,8 @@ public class DataCache {
     public void fillDataCache() throws IOException {
         ServerProxy serverProxy = new ServerProxy();
 
-        PersonResult personResult = (PersonResult) serverProxy.doGet("http://10.0.2.2:7979/person", this.authToken);
-        EventResult eventResult = (EventResult) serverProxy.doGet("http://10.0.2.2:7979/event", this.authToken);
+        PersonResult personResult = (PersonResult) serverProxy.doGet(personUrl, this.authToken);
+        EventResult eventResult = (EventResult) serverProxy.doGet(eventUrl, this.authToken);
 
         if (personResult.isSuccess() && eventResult.isSuccess()) {
             fillPersonById(personResult);

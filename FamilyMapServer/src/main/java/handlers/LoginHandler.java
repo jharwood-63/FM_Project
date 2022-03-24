@@ -28,9 +28,11 @@ public class LoginHandler implements HttpHandler {
 
                 if (response.isSuccess()) {
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                    System.out.println("Success code Sent");
                 }
                 else {
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                    System.out.println("Bad request code sent");
                 }
 
                 OutputStream respBody = exchange.getResponseBody();
@@ -45,6 +47,7 @@ public class LoginHandler implements HttpHandler {
             }
         }
         catch (IOException e) {
+            System.out.println("Internal server error");
             e.printStackTrace();
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, 0);
             OutputStream respBody = exchange.getResponseBody();

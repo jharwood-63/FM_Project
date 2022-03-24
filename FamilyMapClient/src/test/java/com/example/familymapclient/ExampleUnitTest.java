@@ -12,6 +12,7 @@ import java.util.Map;
 import data.DataCache;
 import model.Person;
 import model.User;
+import requests.LoginRequest;
 import requests.RegisterRequest;
 import requests.UserRequest;
 
@@ -41,10 +42,10 @@ public class ExampleUnitTest {
     public void postTest() throws IOException {
         ServerProxy serverProxy = new ServerProxy();
         try {
-            URL registerUrl = new URL("http://localhost:7979/user/register");
-            UserRequest registerRequest = new RegisterRequest("u", "p", "e", "j", "h", "m");
+            URL loginUrl = new URL("http://10.0.2.2:7979/user/login");
+            UserRequest loginRequest = new LoginRequest("u", "p");
 
-            serverProxy.doPost(registerUrl, registerRequest);
+            serverProxy.doPost(loginUrl, loginRequest);
         }
         catch (IOException e) {
             e.printStackTrace();

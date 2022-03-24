@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.util.Log;
@@ -263,7 +264,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
-                Handler uiThreadMessageHandler = new Handler() {
+                Handler uiThreadMessageHandler = new Handler(Looper.getMainLooper()) {
                     @Override
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();
@@ -292,7 +293,7 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 dataCache.setUrls(serverHost.getText().toString(), serverPort.getText().toString());
 
-                Handler uiThreadMessageHandler = new Handler() {
+                Handler uiThreadMessageHandler = new Handler(Looper.getMainLooper()) {
                     @Override
                     public void handleMessage(Message message) {
                         Bundle bundle = message.getData();

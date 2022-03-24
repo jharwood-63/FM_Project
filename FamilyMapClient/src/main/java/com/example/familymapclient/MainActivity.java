@@ -51,11 +51,14 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public void notifyDone() {
+        /*
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = new MapFragment();
 
         fragmentManager.beginTransaction()
                 .replace(R.id.fragmentFrameLayout, fragment)
                 .commit();
+
+         */
     }
 }

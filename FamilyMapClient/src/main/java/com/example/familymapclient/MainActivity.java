@@ -3,22 +3,11 @@ package com.example.familymapclient;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
+
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.widget.Toast;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import data.DataCache;
-import model.Person;
-import requests.UserRequest;
-import result.LoginResult;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
 
@@ -26,6 +15,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Iconify.with(new FontAwesomeModule());
 
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragmentFrameLayout);

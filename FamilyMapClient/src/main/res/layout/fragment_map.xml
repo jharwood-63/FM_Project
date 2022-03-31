@@ -15,8 +15,8 @@
         android:id="@+id/mapTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="test"
+        android:layout_margin="50dp"
+        android:text="Insert event info here"
         android:layout_alignParentBottom="true"
         android:textAlignment="center"/>
 

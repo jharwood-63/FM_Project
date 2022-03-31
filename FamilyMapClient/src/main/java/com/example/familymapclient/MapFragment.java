@@ -1,5 +1,6 @@
 package com.example.familymapclient;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,10 +17,14 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.CameraUpdateFactory;
+
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,15 +34,24 @@ import model.Person;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
-    private GoogleMap map;
-    private DataCache dataCache = DataCache.getInstance();
-
     /*Colors*/
+    //Markers
     private static final float BIRTH_COLOR = BitmapDescriptorFactory.HUE_BLUE;
     private static final float MARRIAGE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
     private static final float DEATH_COLOR = BitmapDescriptorFactory.HUE_RED;
-    //FIXME: need to add colors for the other events, this is just a default one that needs to be changed
+    private static final float BAPTISM_COLOR = BitmapDescriptorFactory.HUE_CYAN;
+    private static final float RETIREMENT_COLOR = BitmapDescriptorFactory.HUE_MAGENTA;
+    private static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
     private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
+
+    private Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
+            colorRes(R.color.male_icon).sizeDp(40);
+    private Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
+            colorRes(R.color.female_icon).sizeDp(40);
+
+    private GoogleMap map;
+    private DataCache dataCache = DataCache.getInstance();
+    private Set<Polyline> lines = new HashSet<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +75,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         placeMarkers();
 
+        /*
+         * Create an onClickListener
+         * when the marker is clicked use get tag to get the event
+         * draw lines
+         */
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                removeLines();
+                Event selectedEvent = (Event) marker.getTag();
+                createLines(selectedEvent);
+
+                return false;
+            }
+        });
 
     }
 
@@ -94,6 +123,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
             color = DEATH_COLOR;
         }
+        else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
+            color = BAPTISM_COLOR;
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
+            color = RETIREMENT_COLOR;
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
+            color = FIRST_KISS_COLOR;
+        }
         else {
             color = DEFAULT_COLOR;
         }
@@ -101,18 +139,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return color;
     }
 
-    private void createLines() {
-        //get the selected event?
-
+    private void createLines(Event selectedEvent) {
         // spouse -> selected event to spouse's birth
-
-        //find the spouse birth
-
-        //  get the personID for the selected event
-        //  use personID to get the person
-        //  get the spouseID of that person
-        //  get the events associated with the spouseID
-        //  get the birth event
+        // find the spouse birth
+        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
+        drawLine(selectedEvent, spouseBirthEvent, getActivity().getResources().getColor(R.color.spouse_line), 10);
 
         /* family tree
          * selected event to father's birth event, or earliest event
@@ -122,7 +153,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // life story -> connect each event in life story
     }
 
-    private Event getBirthEvent(String personID) {
+    private Event getSpouseBirthEvent(String personID) {
         Person eventPerson = dataCache.getPerson(personID);
         String spouseID = eventPerson.getSpouseID();
 
@@ -146,11 +177,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         int color = (int) lineColor;
 
-        PolylineOptions options = new PolylineOptions()
+        Polyline line = map.addPolyline(new PolylineOptions()
                 .add(startPoint)
                 .add(endPoint)
                 .color(color)
-                .width(width);
-        Polyline line = map.addPolyline(options);
+                .width(width));
+
+        lines.add(line);
+    }
+
+    private void removeLines() {
+        for (Polyline line : lines) {
+            line.remove();
+        }
+
+        lines.clear();
     }
 }

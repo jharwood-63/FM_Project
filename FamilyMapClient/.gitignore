@@ -1,2 +1,3 @@
 /build
-AndroidManifest.xml
+/src/main/AndroidManifest.xml
+/src/main/res/values/strings.xml

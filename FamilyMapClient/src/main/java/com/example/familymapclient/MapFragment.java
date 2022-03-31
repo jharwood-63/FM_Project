@@ -1,6 +1,7 @@
 package com.example.familymapclient;
 
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,12 +55,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private GoogleMap map;
     private DataCache dataCache = DataCache.getInstance();
     private Set<Polyline> lines = new HashSet<>();
+    private View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        view = inflater.inflate(R.layout.fragment_map, container, false);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -83,9 +87,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                removeLines();
                 Event selectedEvent = (Event) marker.getTag();
+                Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
+                removeLines();
                 createLines(selectedEvent);
+
+                TextView personName = (TextView) view.findViewById(R.id.personNameText);
+                TextView location = (TextView) view.findViewById(R.id.locationNameText);
+                ImageView genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
+
+                personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
+                location.setText(getString(R.string.location_name, selectedEvent.getEventType(), selectedEvent.getCity(), selectedEvent.getCountry()));
+
+                String personGender = eventPerson.getGender();
+
+                switch (personGender) {
+                    case "m":
+                        genderImageView.setImageDrawable(maleIcon);
+                        break;
+                    case "f":
+                        genderImageView.setImageDrawable(femaleIcon);
+                }
 
                 return false;
             }

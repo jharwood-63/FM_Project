@@ -11,31 +11,46 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/mapTextLayout"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/mapTextLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="50dp"
-        android:layout_alignParentBottom="true">
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="25dp">
+
         <ImageView
             android:id="@+id/genderIcon"
-            android:contentDescription="@string/image_description"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@id/personNameText"/>
+            android:layout_marginEnd="50dp"
+            android:contentDescription="@string/image_description" />
 
-        <TextView
-            android:id="@+id/personNameText"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/infoText"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/locationNameText"
-            android:text="@string/person_name"/>
-        <TextView
-            android:id="@+id/locationNameText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/location_name"/>
+            android:gravity="center"
+            android:orientation="vertical">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/personNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/person_name"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/locationNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/location_name"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

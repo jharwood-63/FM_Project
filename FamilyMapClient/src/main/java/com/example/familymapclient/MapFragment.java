@@ -47,15 +47,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
     private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
 
-    private Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
-            colorRes(R.color.male_icon).sizeDp(40);
-    private Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
-            colorRes(R.color.female_icon).sizeDp(40);
-
     private GoogleMap map;
+    private View view;
+    private Event selectedEvent = null;
     private DataCache dataCache = DataCache.getInstance();
     private Set<Polyline> lines = new HashSet<>();
-    private View view;
+
+    TextView personName;
+    TextView location;
+    ImageView genderImageView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,6 +65,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        personName = (TextView) view.findViewById(R.id.personNameText);
+        location = (TextView) view.findViewById(R.id.locationNameText);
+        genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
+
+        if (selectedEvent == null) {
+            personName.setText(getString(R.string.await_click));
+            location.setText("");
+        }
 
         return view;
     }
@@ -87,14 +96,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                Event selectedEvent = (Event) marker.getTag();
+                selectedEvent = (Event) marker.getTag();
                 Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
                 removeLines();
                 createLines(selectedEvent);
-
-                TextView personName = (TextView) view.findViewById(R.id.personNameText);
-                TextView location = (TextView) view.findViewById(R.id.locationNameText);
-                ImageView genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
 
                 personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
                 location.setText(getString(R.string.location_name, selectedEvent.getEventType(), selectedEvent.getCity(), selectedEvent.getCountry()));
@@ -103,9 +108,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                 switch (personGender) {
                     case "m":
+                        Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
+                                colorRes(R.color.male_icon).sizeDp(40);
                         genderImageView.setImageDrawable(maleIcon);
                         break;
                     case "f":
+                        Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
+                                colorRes(R.color.female_icon).sizeDp(40);
                         genderImageView.setImageDrawable(femaleIcon);
                 }
 

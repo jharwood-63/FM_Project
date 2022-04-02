@@ -2,9 +2,11 @@ package com.example.familymapclient;
 
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -27,9 +29,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import data.DataCache;
 import model.Event;
@@ -102,7 +106,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 createLines(selectedEvent);
 
                 personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
-                location.setText(getString(R.string.location_name, selectedEvent.getEventType(), selectedEvent.getCity(), selectedEvent.getCountry()));
+                location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(), selectedEvent.getCity(), selectedEvent.getCountry()));
 
                 String personGender = eventPerson.getGender();
 
@@ -171,9 +175,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void createLines(Event selectedEvent) {
+        Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
         // spouse -> selected event to spouse's birth
         // find the spouse birth
-        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
+        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID(), personEvents);
         drawLine(selectedEvent, spouseBirthEvent, getActivity().getResources().getColor(R.color.spouse_line), 10);
 
         /* family tree
@@ -181,14 +186,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
          * selected event to mother's birth event, or earliest event
          * from each birth event to parents birth event, or earliest event
          */
-        // life story -> connect each event in life story
+        // life story -> connect each event in life story, chronologically
+        Set<Event> events = personEvents.get(selectedEvent.getPersonID());
+
+        //save the birth event and death event and then just sort the other events
+
+        //FIXME: change the sorting algorithm
+        /*
+         * Birth events, if present, are always first
+         * Events sorted primarily by year, and secondarily by event type
+         * normalized to lower-case
+         * Death events, if present, are always last
+         */
+        Event[] sortedEvents = sortEvents(events);
+
     }
 
-    private Event getSpouseBirthEvent(String personID) {
+    private Event getSpouseBirthEvent(String personID, Map<String, Set<Event>> personEvents) {
         Person eventPerson = dataCache.getPerson(personID);
         String spouseID = eventPerson.getSpouseID();
 
-        Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
         Set<Event> events = personEvents.get(spouseID);
 
         Event spouseBirth = null;
@@ -200,6 +217,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return spouseBirth;
+    }
+
+    private Event findEvent(Set<Event> events, String eventType) {
+        for (Event event : events) {
+
+        }
+    }
+
+    private Event[] sortEvents(Set<Event> events) {
+        Event[] sortedEvents = new Event[events.size()];
+        sortedEvents = events.toArray(sortedEvents);
+
+        Event temp;
+
+        for (int i = 0; i < sortedEvents.length; i++) {
+            for (int j = 1; j < sortedEvents.length - i; j++) {
+                if (sortedEvents[j-1].getYear() < sortedEvents[j].getYear()) {
+                    temp = sortedEvents[j-1];
+                    sortedEvents[j-1] = sortedEvents[j];
+                    sortedEvents[j] = temp;
+                }
+            }
+        }
+
+        return sortedEvents;
     }
 
     private void drawLine(Event startEvent, Event endEvent, float lineColor, float width) {

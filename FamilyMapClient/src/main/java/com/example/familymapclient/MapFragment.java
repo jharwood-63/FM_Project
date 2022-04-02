@@ -187,19 +187,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
          * from each birth event to parents birth event, or earliest event
          */
         // life story -> connect each event in life story, chronologically
-        Set<Event> events = personEvents.get(selectedEvent.getPersonID());
-
-        //save the birth event and death event and then just sort the other events
-
-        //FIXME: change the sorting algorithm
         /*
          * Birth events, if present, are always first
          * Events sorted primarily by year, and secondarily by event type
          * normalized to lower-case
          * Death events, if present, are always last
          */
+
+        Set<Event> events = personEvents.get(selectedEvent.getPersonID());
+
         Event[] sortedEvents = sortEvents(events);
 
+        float color = getActivity().getResources().getColor(R.color.life_line);
+        drawLine(sortedEvents[0], sortedEvents[1], color, 10);
+        for (int i = 1; i < sortedEvents.length; i++) {
+            if (i != (sortedEvents.length - 1)) {
+                drawLine(sortedEvents[1], sortedEvents[i + 1], color, 10);
+            }
+        }
     }
 
     private Event getSpouseBirthEvent(String personID, Map<String, Set<Event>> personEvents) {
@@ -219,18 +224,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return spouseBirth;
     }
 
-    private Event findEvent(Set<Event> events, String eventType) {
-        for (Event event : events) {
-
-        }
-    }
-
     private Event[] sortEvents(Set<Event> events) {
         Event[] sortedEvents = new Event[events.size()];
         sortedEvents = events.toArray(sortedEvents);
 
         Event temp;
-
         for (int i = 0; i < sortedEvents.length; i++) {
             for (int j = 1; j < sortedEvents.length - i; j++) {
                 if (sortedEvents[j-1].getYear() < sortedEvents[j].getYear()) {
@@ -242,6 +240,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return sortedEvents;
+    }
+
+    private Event findEvent(Set<Event> events, String eventType) {
+        for (Event event : events) {
+            if (event.getEventType().equalsIgnoreCase(eventType)) {
+                return event;
+            }
+        }
+
+        return null;
     }
 
     private void drawLine(Event startEvent, Event endEvent, float lineColor, float width) {

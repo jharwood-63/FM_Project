@@ -176,33 +176,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void createLines(Event selectedEvent) {
         Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
+        float color = getActivity().getResources().getColor(R.color.spouse_line);
         // spouse -> selected event to spouse's birth
-        // find the spouse birth
         Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID(), personEvents);
-        drawLine(selectedEvent, spouseBirthEvent, getActivity().getResources().getColor(R.color.spouse_line), 10);
+        drawLine(selectedEvent, spouseBirthEvent, color, 10);
 
         /* family tree
          * selected event to father's birth event, or earliest event
          * selected event to mother's birth event, or earliest event
          * from each birth event to parents birth event, or earliest event
          */
-        // life story -> connect each event in life story, chronologically
-        /*
-         * Birth events, if present, are always first
-         * Events sorted primarily by year, and secondarily by event type
-         * normalized to lower-case
-         * Death events, if present, are always last
-         */
 
+        // life story -> connect each event in life story, chronologically
         Set<Event> events = personEvents.get(selectedEvent.getPersonID());
 
         Event[] sortedEvents = sortEvents(events);
 
-        float color = getActivity().getResources().getColor(R.color.life_line);
+        color = getActivity().getResources().getColor(R.color.life_line);
         drawLine(sortedEvents[0], sortedEvents[1], color, 10);
         for (int i = 1; i < sortedEvents.length; i++) {
             if (i != (sortedEvents.length - 1)) {
-                drawLine(sortedEvents[1], sortedEvents[i + 1], color, 10);
+                drawLine(sortedEvents[i], sortedEvents[i + 1], color, 10);
             }
         }
     }
@@ -231,7 +225,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Event temp;
         for (int i = 0; i < sortedEvents.length; i++) {
             for (int j = 1; j < sortedEvents.length - i; j++) {
-                if (sortedEvents[j-1].getYear() < sortedEvents[j].getYear()) {
+                if (sortedEvents[j-1].getYear() > sortedEvents[j].getYear()) {
                     temp = sortedEvents[j-1];
                     sortedEvents[j-1] = sortedEvents[j];
                     sortedEvents[j] = temp;
@@ -240,16 +234,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return sortedEvents;
-    }
-
-    private Event findEvent(Set<Event> events, String eventType) {
-        for (Event event : events) {
-            if (event.getEventType().equalsIgnoreCase(eventType)) {
-                return event;
-            }
-        }
-
-        return null;
     }
 
     private void drawLine(Event startEvent, Event endEvent, float lineColor, float width) {

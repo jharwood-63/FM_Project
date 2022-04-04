@@ -3,13 +3,19 @@ package com.example.familymapclient;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
+    private boolean isLoggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,20 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //FIXME: with the if statement the menu doesn't display but without it the menu displays on the login screen and the map
+        if (isLoggedIn) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.main_menu, menu);
+
+            MenuItem searchMenuItem = menu.findItem(R.id.searchMenuItem);
+            MenuItem settingsMenuItem = menu.findItem(R.id.settingsMenuItem);
+        }
+
+        return true;
+    }
+
     private Fragment createLoginFragment() {
         LoginFragment loginFragment = new LoginFragment();
         loginFragment.registerListener(this);
@@ -48,5 +68,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         fragmentManager.beginTransaction()
                 .replace(R.id.fragmentFrameLayout, fragment)
                 .commit();
+
+        isLoggedIn = true;
     }
 }

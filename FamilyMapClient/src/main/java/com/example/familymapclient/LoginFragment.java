@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import data.DataCache;
+import data.ServerProxy;
 import model.Person;
 import requests.LoginRequest;
 import requests.RegisterRequest;

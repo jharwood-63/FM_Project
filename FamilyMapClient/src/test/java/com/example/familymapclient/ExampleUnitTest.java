@@ -2,18 +2,14 @@ package com.example.familymapclient;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import data.DataCache;
-import model.Person;
+import data.ServerProxy;
 import model.User;
 import requests.LoginRequest;
-import requests.RegisterRequest;
 import requests.UserRequest;
 
 /**

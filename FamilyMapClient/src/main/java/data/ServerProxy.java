@@ -1,4 +1,4 @@
-package com.example.familymapclient;
+package data;
 
 import com.google.gson.Gson;
 

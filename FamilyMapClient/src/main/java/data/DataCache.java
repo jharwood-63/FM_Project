@@ -2,8 +2,6 @@ package data;
 
 import android.util.Log;
 
-import com.example.familymapclient.ServerProxy;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +10,6 @@ import java.util.Set;
 
 import model.Event;
 import model.Person;
-import model.User;
 import result.EventResult;
 import result.PersonResult;
 

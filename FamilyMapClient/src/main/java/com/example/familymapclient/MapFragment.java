@@ -55,6 +55,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private View view;
     private Event selectedEvent = null;
     private DataCache dataCache = DataCache.getInstance();
+    private Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private Set<Polyline> lines = new HashSet<>();
 
     TextView personName;
@@ -92,11 +93,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         placeMarkers();
 
-        /*
-         * Create an onClickListener
-         * when the marker is clicked use get tag to get the event
-         * draw lines
-         */
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
@@ -125,12 +121,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 return false;
             }
         });
-
     }
 
     private void placeMarkers() {
-        DataCache dataCache = DataCache.getInstance();
-
         Map<String, Event> eventMap = dataCache.getEventById();
 
         for (Map.Entry<String, Event> eventEntry : eventMap.entrySet()) {
@@ -175,10 +168,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void createLines(Event selectedEvent) {
-        Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
         float color = getActivity().getResources().getColor(R.color.spouse_line);
         // spouse -> selected event to spouse's birth
-        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID(), personEvents);
+        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
         drawLine(selectedEvent, spouseBirthEvent, color, 10);
 
         /* family tree
@@ -186,10 +178,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
          * selected event to mother's birth event, or earliest event
          * from each birth event to parents birth event, or earliest event
          */
+        Person parent = dataCache.getPerson(selectedEvent.getPersonID());
+        drawFamilyLines(parent, selectedEvent, 15);
 
         // life story -> connect each event in life story, chronologically
         Set<Event> events = personEvents.get(selectedEvent.getPersonID());
-
         Event[] sortedEvents = sortEvents(events);
 
         color = getActivity().getResources().getColor(R.color.life_line);
@@ -201,7 +194,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private Event getSpouseBirthEvent(String personID, Map<String, Set<Event>> personEvents) {
+    private Event getSpouseBirthEvent(String personID) {
         Person eventPerson = dataCache.getPerson(personID);
         String spouseID = eventPerson.getSpouseID();
 
@@ -216,6 +209,39 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return spouseBirth;
+    }
+
+    private void drawFamilyLines(Person parent, Event startEvent, int lineWidth) {
+        Map<String, Person> personById = dataCache.getPersonById();
+        Person father = personById.get(parent.getFatherID());
+        Person mother = personById.get(parent.getMotherID());
+
+        if (father != null && mother != null) {
+            Set<Event> fatherEvents = personEvents.get(father.getPersonID());
+            Set<Event> motherEvents = personEvents.get(mother.getPersonID());
+
+            Event fatherBirthEvent = findEvent(fatherEvents, getString(R.string.birth_event));
+            Event motherBirthEvent = findEvent(motherEvents, getString(R.string.birth_event));
+
+            if (fatherBirthEvent != null && motherBirthEvent != null) {
+                float color = getActivity().getResources().getColor(R.color.family_line);
+                drawLine(startEvent, fatherBirthEvent, color, lineWidth);
+                drawLine(startEvent, motherBirthEvent, color, lineWidth);
+
+                drawFamilyLines(father, fatherBirthEvent, lineWidth - 3);
+                drawFamilyLines(mother, motherBirthEvent, lineWidth - 3);
+            }
+        }
+    }
+
+    private Event findEvent(Set<Event> events, String eventType) {
+        for (Event event : events) {
+            if (event.getEventType().equalsIgnoreCase(eventType)) {
+                return event;
+            }
+        }
+
+        return null;
     }
 
     private Event[] sortEvents(Set<Event> events) {

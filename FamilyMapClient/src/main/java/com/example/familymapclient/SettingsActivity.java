@@ -27,6 +27,8 @@ public class SettingsActivity extends AppCompatActivity {
         SwitchCompat femaleEvents = (SwitchCompat) findViewById(R.id.femaleEventsSwitch);
         Button logoutButton = (Button) findViewById(R.id.logoutButton);
 
+        lifeStory.setChecked(true);
+
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

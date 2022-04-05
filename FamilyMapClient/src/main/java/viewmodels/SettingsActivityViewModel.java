@@ -66,8 +66,4 @@ public class SettingsActivityViewModel extends ViewModel {
     public void setFemaleEventsEnabled(boolean femaleEventsEnabled) {
         this.femaleEventsEnabled = femaleEventsEnabled;
     }
-
-    public void setLoggedOut(boolean isLoggedOut) {
-
-    }
 }

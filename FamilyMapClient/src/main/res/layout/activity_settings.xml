@@ -40,6 +40,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/lifeStorySwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/lifeStoryText"
@@ -80,6 +81,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/familyTreeSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/familyTreeText"
@@ -120,6 +122,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/spouseSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/spouseText"
@@ -160,6 +163,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/fatherSideSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/fatherSideText"
@@ -200,6 +204,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/motherSideSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/motherSideText"
@@ -240,6 +245,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/maleEventsSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/maleEventText"
@@ -280,6 +286,7 @@
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/femaleEventsSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/femaleEventText"
@@ -294,34 +301,11 @@
         android:background="#000000"/>
 
     <TableRow>
-        <RelativeLayout
+        <Button
+            android:id="@+id/logoutButton"
             android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:clickable="true"
-            android:focusable="true">
-
-            <LinearLayout
-                android:id="@+id/logoutText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/logout_button"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/logout_subtitle"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
+            android:layout_width="match_parent"
+            android:text="@string/logout_button"/>
     </TableRow>
 
     <View

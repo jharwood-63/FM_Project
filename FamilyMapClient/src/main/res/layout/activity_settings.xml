@@ -4,16 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+
     tools:context=".SettingsActivity">
 
-    <TableRow
+    <TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#000000"/>
+
         <RelativeLayout
             android:layout_height="match_parent"
-            android:layout_width="match_parent">
+            android:layout_width="wrap_content">
 
             <LinearLayout
                 android:id="@+id/lifeStoryText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="start">
@@ -30,8 +37,296 @@
                     android:textSize="15sp"
                     android:text="@string/life_story_subtitle"/>
 
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/lifeStoryText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/familyTreeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/family_tree_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/family_tree_subtitle"/>
 
             </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/familyTreeText"
+                android:gravity="center_vertical"/>
+
         </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/spouseText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/spouse_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/spouse_subtitle"/>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/spouseText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/fatherSideText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/father_side_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/father_side_subtitle"/>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/fatherSideText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/motherSideText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/mother_side_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/mother_side_subtitle"/>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/motherSideText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/maleEventText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="start">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/male_events_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/gender_events_subtitle"/>
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/maleEventText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/femaleEventText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/female_events_title"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gender_events_subtitle"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/femaleEventText"
+                android:gravity="center_vertical"/>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
+
+    <TableRow>
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:id="@+id/logoutText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logout_button"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/logout_subtitle"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </TableRow>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#000000"/>
 
 </TableLayout>

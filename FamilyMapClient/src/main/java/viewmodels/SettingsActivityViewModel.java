@@ -3,13 +3,25 @@ package viewmodels;
 import androidx.lifecycle.ViewModel;
 
 public class SettingsActivityViewModel extends ViewModel {
-    private boolean lifeLinesEnabled;
-    private boolean familyTreeEnabled;
-    private boolean spouseLinesEnabled;
-    private boolean fatherSideEnabled;
-    private boolean motherSideEnabled;
-    private boolean maleEventsEnabled;
-    private boolean femaleEventsEnabled;
+    private static SettingsActivityViewModel instance;
+
+    private boolean lifeLinesEnabled = true;
+    private boolean familyTreeEnabled = true;
+    private boolean spouseLinesEnabled = true;
+    private boolean fatherSideEnabled = true;
+    private boolean motherSideEnabled = true;
+    private boolean maleEventsEnabled = true;
+    private boolean femaleEventsEnabled = true;
+
+    public static SettingsActivityViewModel getInstance() {
+        if (instance == null) {
+            instance = new SettingsActivityViewModel();
+        }
+
+        return instance;
+    }
+
+    private SettingsActivityViewModel() {}
 
     public boolean isLifeLinesEnabled() {
         return lifeLinesEnabled;

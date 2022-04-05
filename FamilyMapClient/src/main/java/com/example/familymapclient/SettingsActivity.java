@@ -2,6 +2,7 @@ package com.example.familymapclient;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,23 +12,40 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import viewmodels.SettingsActivityViewModel;
+
 public class SettingsActivity extends AppCompatActivity {
+    private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
+
+    private SwitchCompat lifeStory;
+    private SwitchCompat familyTree;
+    private SwitchCompat spouseLines;
+    private SwitchCompat fatherSide;
+    private SwitchCompat motherSide;
+    private SwitchCompat maleEvents;
+    private SwitchCompat femaleEvents;
+
+    /*
+    private SettingsActivityViewModel getViewModel() {
+        return new ViewModelProvider(this).get(SettingsActivityViewModel.class);
+    }
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        SwitchCompat lifeStory = (SwitchCompat) findViewById(R.id.lifeStorySwitch);
-        SwitchCompat familyTree = (SwitchCompat) findViewById(R.id.familyTreeSwitch);
-        SwitchCompat spouse = (SwitchCompat) findViewById(R.id.spouseSwitch);
-        SwitchCompat fatherSide = (SwitchCompat) findViewById(R.id.fatherSideSwitch);
-        SwitchCompat motherSide = (SwitchCompat) findViewById(R.id.motherSideSwitch);
-        SwitchCompat maleEvents = (SwitchCompat) findViewById(R.id.maleEventsSwitch);
-        SwitchCompat femaleEvents = (SwitchCompat) findViewById(R.id.femaleEventsSwitch);
+        lifeStory = (SwitchCompat) findViewById(R.id.lifeStorySwitch);
+        familyTree = (SwitchCompat) findViewById(R.id.familyTreeSwitch);
+        spouseLines = (SwitchCompat) findViewById(R.id.spouseSwitch);
+        fatherSide = (SwitchCompat) findViewById(R.id.fatherSideSwitch);
+        motherSide = (SwitchCompat) findViewById(R.id.motherSideSwitch);
+        maleEvents = (SwitchCompat) findViewById(R.id.maleEventsSwitch);
+        femaleEvents = (SwitchCompat) findViewById(R.id.femaleEventsSwitch);
         Button logoutButton = (Button) findViewById(R.id.logoutButton);
 
-        lifeStory.setChecked(true);
+        setSwitches();
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,12 +54,41 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        lifeStory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setLifeLinesEnabled(!settingsActivityViewModel.isLifeLinesEnabled());
+            }
+        });
 
+        familyTree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setFamilyTreeEnabled(!settingsActivityViewModel.isFamilyTreeEnabled());
+            }
+        });
+
+        spouseLines.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setSpouseLinesEnabled(!settingsActivityViewModel.isSpouseLinesEnabled());
+            }
+        });
     }
 
     private void logout() {
         Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
         intent.putExtra(getString(R.string.login_key), false);
         startActivity(intent);
+    }
+
+    private void setSwitches() {
+        lifeStory.setChecked(settingsActivityViewModel.isLifeLinesEnabled());
+        familyTree.setChecked(settingsActivityViewModel.isFamilyTreeEnabled());
+        spouseLines.setChecked(settingsActivityViewModel.isSpouseLinesEnabled());
+        fatherSide.setChecked(settingsActivityViewModel.isFatherSideEnabled());
+        motherSide.setChecked(settingsActivityViewModel.isMotherSideEnabled());
+        maleEvents.setChecked(settingsActivityViewModel.isMaleEventsEnabled());
+        femaleEvents.setChecked(settingsActivityViewModel.isFemaleEventsEnabled());
     }
 }

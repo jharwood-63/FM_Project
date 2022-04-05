@@ -38,6 +38,7 @@ import java.util.TreeSet;
 import data.DataCache;
 import model.Event;
 import model.Person;
+import viewmodels.SettingsActivityViewModel;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
@@ -168,28 +169,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void createLines(Event selectedEvent) {
+        SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
         float color = getActivity().getResources().getColor(R.color.spouse_line);
         // spouse -> selected event to spouse's birth
-        Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
-        drawLine(selectedEvent, spouseBirthEvent, color, 10);
+        if (settingsActivityViewModel.isSpouseLinesEnabled()) {
+            Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
+            drawLine(selectedEvent, spouseBirthEvent, color, 10);
+        }
 
         /* family tree
          * selected event to father's birth event, or earliest event
          * selected event to mother's birth event, or earliest event
          * from each birth event to parents birth event, or earliest event
          */
-        Person parent = dataCache.getPerson(selectedEvent.getPersonID());
-        drawFamilyLines(parent, selectedEvent, 15);
+        if (settingsActivityViewModel.isFamilyTreeEnabled()) {
+            Person parent = dataCache.getPerson(selectedEvent.getPersonID());
+            drawFamilyLines(parent, selectedEvent, 15);
+        }
 
         // life story -> connect each event in life story, chronologically
-        Set<Event> events = personEvents.get(selectedEvent.getPersonID());
-        Event[] sortedEvents = sortEvents(events);
+        if (settingsActivityViewModel.isLifeLinesEnabled()) {
+            Set<Event> events = personEvents.get(selectedEvent.getPersonID());
+            Event[] sortedEvents = sortEvents(events);
 
-        color = getActivity().getResources().getColor(R.color.life_line);
-        drawLine(sortedEvents[0], sortedEvents[1], color, 10);
-        for (int i = 1; i < sortedEvents.length; i++) {
-            if (i != (sortedEvents.length - 1)) {
-                drawLine(sortedEvents[i], sortedEvents[i + 1], color, 10);
+            color = getActivity().getResources().getColor(R.color.life_line);
+            drawLine(sortedEvents[0], sortedEvents[1], color, 10);
+            for (int i = 1; i < sortedEvents.length; i++) {
+                if (i != (sortedEvents.length - 1)) {
+                    drawLine(sortedEvents[i], sortedEvents[i + 1], color, 10);
+                }
             }
         }
     }

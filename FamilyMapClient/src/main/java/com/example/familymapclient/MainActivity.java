@@ -15,7 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.Listener {
-    private boolean isLoggedIn = false;
+    private MenuItem searchMenuItem;
+    private MenuItem settingsMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +43,27 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //FIXME: with the if statement the menu doesn't display but without it the menu displays on the login screen and the map
-        if (isLoggedIn) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.main_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
 
-            MenuItem searchMenuItem = menu.findItem(R.id.searchMenuItem);
-            MenuItem settingsMenuItem = menu.findItem(R.id.settingsMenuItem);
-        }
+        searchMenuItem = menu.findItem(R.id.searchMenuItem);
+        settingsMenuItem = menu.findItem(R.id.settingsMenuItem);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case R.id.searchMenuItem:
+                //switch to the search activity
+                return true;
+            case R.id.settingsMenuItem:
+                //switch to the settings activity
+                return true;
+            default:
+                return super.onOptionsItemSelected(menuItem);
+        }
     }
 
     private Fragment createLoginFragment() {
@@ -69,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 .replace(R.id.fragmentFrameLayout, fragment)
                 .commit();
 
-        isLoggedIn = true;
+        searchMenuItem.setVisible(true);
+        settingsMenuItem.setVisible(true);
     }
 }

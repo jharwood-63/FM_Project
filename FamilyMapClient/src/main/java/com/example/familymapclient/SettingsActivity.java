@@ -74,6 +74,34 @@ public class SettingsActivity extends AppCompatActivity {
                 settingsActivityViewModel.setSpouseLinesEnabled(!settingsActivityViewModel.isSpouseLinesEnabled());
             }
         });
+
+        fatherSide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setFatherSideEnabled(!settingsActivityViewModel.isFatherSideEnabled());
+            }
+        });
+
+        motherSide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setMotherSideEnabled(!settingsActivityViewModel.isMotherSideEnabled());
+            }
+        });
+
+        maleEvents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setMaleEventsEnabled(!settingsActivityViewModel.isMaleEventsEnabled());
+            }
+        });
+
+        femaleEvents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsActivityViewModel.setFemaleEventsEnabled(!settingsActivityViewModel.isFemaleEventsEnabled());
+            }
+        });
     }
 
     private void logout() {

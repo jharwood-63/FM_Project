@@ -58,6 +58,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private DataCache dataCache = DataCache.getInstance();
     private Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private Set<Polyline> lines = new HashSet<>();
+    private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
 
     TextView personName;
     TextView location;
@@ -125,11 +126,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void placeMarkers() {
-        Map<String, Event> eventMap = dataCache.getEventById();
+        Set<Event> filteredEvents = getFilteredEvents();
 
-        for (Map.Entry<String, Event> eventEntry : eventMap.entrySet()) {
-            Event event = eventEntry.getValue();
-
+        for (Event event : filteredEvents) {
             float markerColor = decideColor(event.getEventType());
 
             Marker marker = map.addMarker(new MarkerOptions().
@@ -137,6 +136,78 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
 
             marker.setTag(event);
+        }
+    }
+
+    private Set<Event> getFilteredEvents() {
+        Set<Event> filteredEvents;
+
+        boolean fatherSide = settingsActivityViewModel.isFatherSideEnabled();
+        boolean motherSide = settingsActivityViewModel.isMotherSideEnabled();
+        boolean maleEvents = settingsActivityViewModel.isMaleEventsEnabled();
+        boolean femaleEvents = settingsActivityViewModel.isFemaleEventsEnabled();
+
+        if (fatherSide && !motherSide) {
+            filteredEvents = filterPaternal(maleEvents, femaleEvents);
+        }
+        else if (motherSide && !fatherSide) {
+            filteredEvents = filterMaternal(maleEvents, femaleEvents);
+        }
+        else if (fatherSide && motherSide) {
+            filteredEvents = filterPaternal(maleEvents, femaleEvents);
+            filteredEvents.addAll(filterMaternal(maleEvents, femaleEvents));
+        }
+        else {
+            filteredEvents = filterPaternal(maleEvents, femaleEvents);
+            filteredEvents.addAll(filterMaternal(maleEvents, femaleEvents));
+        }
+
+        return filteredEvents;
+    }
+
+    private Set<Event> filterPaternal(boolean maleEvents, boolean femaleEvents) {
+        Set<Event> filteredEvents = new HashSet<>();
+
+        Set<String> paternalMales = dataCache.getPaternalMales();
+        Set<String> paternalFemales = dataCache.getPaternalFemales();
+
+        if (maleEvents && !femaleEvents) {
+            fillFilteredEvents(paternalMales, filteredEvents);
+        }
+        else if (femaleEvents && !maleEvents) {
+            fillFilteredEvents(paternalFemales, filteredEvents);
+        }
+        else if (maleEvents && femaleEvents) {
+            fillFilteredEvents(paternalMales, filteredEvents);
+            fillFilteredEvents(paternalFemales, filteredEvents);
+        }
+
+        return filteredEvents;
+    }
+
+    private Set<Event> filterMaternal(boolean maleEvents, boolean femaleEvents) {
+        Set<Event> filteredEvents = new HashSet<>();
+
+        Set<String> maternalMales = dataCache.getMaternalMales();
+        Set<String> maternalFemales = dataCache.getMaternalFemales();
+
+        if (maleEvents && !femaleEvents) {
+            fillFilteredEvents(maternalMales, filteredEvents);
+        }
+        else if (femaleEvents && !maleEvents) {
+            fillFilteredEvents(maternalFemales, filteredEvents);
+        }
+        else if (maleEvents && femaleEvents) {
+            fillFilteredEvents(maternalFemales, filteredEvents);
+            fillFilteredEvents(maternalMales, filteredEvents);
+        }
+
+        return filteredEvents;
+    }
+
+    private void fillFilteredEvents(Set<String> personIDs, Set<Event> filteredEvents) {
+        for (String personID : personIDs) {
+            filteredEvents.addAll(personEvents.get(personID));
         }
     }
 
@@ -169,25 +240,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void createLines(Event selectedEvent) {
-        SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
         float color = getActivity().getResources().getColor(R.color.spouse_line);
-        // spouse -> selected event to spouse's birth
+
         if (settingsActivityViewModel.isSpouseLinesEnabled()) {
             Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
             drawLine(selectedEvent, spouseBirthEvent, color, 10);
         }
 
-        /* family tree
-         * selected event to father's birth event, or earliest event
-         * selected event to mother's birth event, or earliest event
-         * from each birth event to parents birth event, or earliest event
-         */
         if (settingsActivityViewModel.isFamilyTreeEnabled()) {
             Person parent = dataCache.getPerson(selectedEvent.getPersonID());
             drawFamilyLines(parent, selectedEvent, 15);
         }
 
-        // life story -> connect each event in life story, chronologically
         if (settingsActivityViewModel.isLifeLinesEnabled()) {
             Set<Event> events = personEvents.get(selectedEvent.getPersonID());
             Event[] sortedEvents = sortEvents(events);

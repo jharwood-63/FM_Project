@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,8 +46,6 @@ import viewmodels.SettingsActivityViewModel;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
-    /*Colors*/
-    //Markers
     private static final float BIRTH_COLOR = BitmapDescriptorFactory.HUE_BLUE;
     private static final float MARRIAGE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
     private static final float DEATH_COLOR = BitmapDescriptorFactory.HUE_RED;
@@ -55,7 +54,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
     private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
 
-    //private GoogleMap map;
     private Set<Polyline> lines = new HashSet<>();
     private Set<Event> filteredEvents = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
@@ -63,9 +61,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
     private final MapViewModel mapViewModel = MapViewModel.getInstance();
 
-    TextView personName;
-    TextView location;
-    ImageView genderImageView;
+    private TextView personName;
+    private TextView location;
+    private ImageView genderImageView;
+    private LinearLayout mapTextLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,11 +78,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         personName = (TextView) view.findViewById(R.id.personNameText);
         location = (TextView) view.findViewById(R.id.locationNameText);
         genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
+        mapTextLayout = (LinearLayout) view.findViewById(R.id.mapTextLayout);
 
         if (mapViewModel.getSelectedEvent() == null) {
-            personName.setText(getString(R.string.await_click));
-            location.setText("");
+            resetTextView();
         }
+
+        mapTextLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //switch fragments, pass the data that it needs
+                //should not switch if no marker is selected
+            }
+        });
 
         return view;
     }
@@ -127,8 +134,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     public void redrawMap(Person eventPerson) {
-        //use this to select the correct marker
-        //center the camera on the location of the event and redraw the lines
         LatLng latLng = new LatLng(mapViewModel.getSelectedEvent().getLatitude(), mapViewModel.getSelectedEvent().getLongitude());
         setTextView(eventPerson);
 
@@ -156,10 +161,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }
         else {
-            //FIXME: CHANGE THE ICON
-            personName.setText(getString(R.string.await_click));
-            location.setText("");
+            resetTextView();
         }
+    }
+
+    private void resetTextView() {
+        Drawable androidIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_android).
+                colorRes(R.color.android_icon).sizeDp(40);
+        genderImageView.setImageDrawable(androidIcon);
+
+        personName.setText(getString(R.string.await_click));
+        location.setText("");
     }
 
     private void placeMarkers() {

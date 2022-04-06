@@ -43,14 +43,4 @@ public class MapViewModel extends ViewModel {
     public void setMap(GoogleMap map) {
         this.map = map;
     }
-
-    public void redrawMap(Person eventPerson) {
-        //use this to select the correct marker
-        //center the camera on the location of the event and redraw the lines
-        LatLng latLng = new LatLng(selectedEvent.getLatitude(), selectedEvent.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //setTextView(eventPerson);
-
-        //createLines(selectedEvent);
-    }
 }

@@ -12,4 +12,5 @@
     <color name="life_line">#00CCFF</color>
     <color name="female_icon">#FF00E3</color>
     <color name="male_icon">#FF3700B3</color>
+    <color name="android_icon">#A4C639</color>
 </resources>

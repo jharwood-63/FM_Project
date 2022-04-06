@@ -156,6 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }
         else {
+            //FIXME: CHANGE THE ICON
             personName.setText(getString(R.string.await_click));
             location.setText("");
         }

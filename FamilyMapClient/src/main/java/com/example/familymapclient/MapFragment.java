@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -38,6 +40,7 @@ import java.util.TreeSet;
 import data.DataCache;
 import model.Event;
 import model.Person;
+import viewmodels.MapViewModel;
 import viewmodels.SettingsActivityViewModel;
 
 
@@ -53,12 +56,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
 
     private GoogleMap map;
-    private View view;
-    private Event selectedEvent = null;
-    private DataCache dataCache = DataCache.getInstance();
-    private Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private Set<Polyline> lines = new HashSet<>();
+    private final DataCache dataCache = DataCache.getInstance();
+    private final Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
+    private final MapViewModel mapViewModel = MapViewModel.getInstance();
 
     TextView personName;
     TextView location;
@@ -68,7 +70,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        view = inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -77,7 +79,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         location = (TextView) view.findViewById(R.id.locationNameText);
         genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
 
-        if (selectedEvent == null) {
+        if (mapViewModel.getSelectedEvent() == null) {
             personName.setText(getString(R.string.await_click));
             location.setText("");
         }
@@ -95,34 +97,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         placeMarkers();
 
+        if (mapViewModel.getSelectedEvent() != null) {
+            Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
+            redrawMap(eventPerson);
+        }
+
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                selectedEvent = (Event) marker.getTag();
-                Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
+                mapViewModel.setSelectedEvent((Event) marker.getTag());
+
+                Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
                 removeLines();
-                createLines(selectedEvent);
+                createLines(mapViewModel.getSelectedEvent());
 
-                personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
-                location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(), selectedEvent.getCity(), selectedEvent.getCountry()));
-
-                String personGender = eventPerson.getGender();
-
-                switch (personGender) {
-                    case "m":
-                        Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
-                                colorRes(R.color.male_icon).sizeDp(40);
-                        genderImageView.setImageDrawable(maleIcon);
-                        break;
-                    case "f":
-                        Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
-                                colorRes(R.color.female_icon).sizeDp(40);
-                        genderImageView.setImageDrawable(femaleIcon);
-                }
+                setTextView(eventPerson);
 
                 return false;
             }
         });
+    }
+
+    private void setTextView(Person eventPerson) {
+        personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
+        location.setText(getString(R.string.location_name, mapViewModel.getSelectedEvent().getEventType().toUpperCase(),
+                mapViewModel.getSelectedEvent().getCity(), mapViewModel.getSelectedEvent().getCountry()));
+
+        String personGender = eventPerson.getGender();
+
+        switch (personGender) {
+            case "m":
+                Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
+                        colorRes(R.color.male_icon).sizeDp(40);
+                genderImageView.setImageDrawable(maleIcon);
+                break;
+            case "f":
+                Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
+                        colorRes(R.color.female_icon).sizeDp(40);
+                genderImageView.setImageDrawable(femaleIcon);
+        }
+    }
+
+    private void redrawMap(Person eventPerson) {
+        //use this to select the correct marker
+        //center the camera on the location of the event and redraw the lines
+        LatLng latLng = new LatLng(mapViewModel.getSelectedEvent().getLatitude(), mapViewModel.getSelectedEvent().getLongitude());
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        setTextView(eventPerson);
+
+        createLines(mapViewModel.getSelectedEvent());
     }
 
     private void placeMarkers() {

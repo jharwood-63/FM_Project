@@ -63,6 +63,13 @@ public class LoginFragment extends Fragment {
         RadioButton maleButton = (RadioButton) view.findViewById(R.id.radio_male);
         RadioButton femaleButton = (RadioButton) view.findViewById(R.id.radio_female);
 
+        //FIXME: FOR TESTING PURPOSES ONLY
+        serverHost.setText("10.0.2.2");
+        serverPort.setText("7979");
+        username.setText("username");
+        password.setText("password");
+
+
         Button loginButton = view.findViewById(R.id.loginButton);
         Button registerButton = view.findViewById(R.id.registerButton);
 

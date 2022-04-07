@@ -174,28 +174,6 @@ public class DataCache {
         this.filteredEvents = filteredEvents;
     }
 
-    public Map<String, Person> getImmediateFamily(String personID) {
-        Map<String, Person> immediateFamily = new HashMap<>();
-        Person person = personById.get(personID);
-
-        immediateFamily.put("Father", personById.get(person.getFatherID()));
-        immediateFamily.put("Mother", personById.get(person.getMotherID()));
-        immediateFamily.put("Spouse", personById.get(person.getSpouseID()));
-        immediateFamily.put("Child", getChild(person));
-
-        return immediateFamily;
-    }
-
-    private Person getChild(Person person) {
-        for (Map.Entry<String, Person> personEntry : personById.entrySet()) {
-            if (personEntry.getValue().getMotherID().equals(person.getPersonID()) || personEntry.getValue().getFatherID().equals(person.getPersonID())) {
-                return personEntry.getValue();
-            }
-        }
-
-        return null;
-    }
-
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }

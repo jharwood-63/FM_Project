@@ -39,6 +39,8 @@ public class DataCache {
     //Key => personID, Value => set of all events associated with that person ID
     private final Map<String, Set<Event>> personEvents = new HashMap<>();
 
+    private Set<Event> filteredEvents = new HashSet<>();
+
     private final Set<String> paternalMales = new HashSet<>();
     private final Set<String> paternalFemales = new HashSet<>();
     private final Set<String> maternalMales = new HashSet<>();
@@ -162,6 +164,36 @@ public class DataCache {
     public void setUrls(String serverHost, String serverPort) {
         personUrl = "http://" + serverHost + ":" + serverPort + "/person";
         eventUrl = "http://" + serverHost + ":" + serverPort + "/event";
+    }
+
+    public Set<Event> getFilteredEvents() {
+        return filteredEvents;
+    }
+
+    public void setFilteredEvents(Set<Event> filteredEvents) {
+        this.filteredEvents = filteredEvents;
+    }
+
+    public Map<String, Person> getImmediateFamily(String personID) {
+        Map<String, Person> immediateFamily = new HashMap<>();
+        Person person = personById.get(personID);
+
+        immediateFamily.put("Father", personById.get(person.getFatherID()));
+        immediateFamily.put("Mother", personById.get(person.getMotherID()));
+        immediateFamily.put("Spouse", personById.get(person.getSpouseID()));
+        immediateFamily.put("Child", getChild(person));
+
+        return immediateFamily;
+    }
+
+    private Person getChild(Person person) {
+        for (Map.Entry<String, Person> personEntry : personById.entrySet()) {
+            if (personEntry.getValue().getMotherID().equals(person.getPersonID()) || personEntry.getValue().getFatherID().equals(person.getPersonID())) {
+                return personEntry.getValue();
+            }
+        }
+
+        return null;
     }
 
     public void setAuthToken(String authToken) {

@@ -54,9 +54,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
     private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
 
-    private Set<Polyline> lines = new HashSet<>();
-    private Set<Event> filteredEvents = new HashSet<>();
+    private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
+    private Set<Event> filteredEvents = dataCache.getFilteredEvents();
     private final Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
     private final MapViewModel mapViewModel = MapViewModel.getInstance();
@@ -104,8 +104,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (mapViewModel.getSelectedEvent() != null) {
             Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
             mapViewModel.getMap().clear();
+
             placeMarkers();
-            redrawMap(eventPerson);
+
+            setTextView(eventPerson);
+            createLines(mapViewModel.getSelectedEvent());
         }
     }
 
@@ -135,49 +138,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         });
     }
 
-    public void redrawMap(Person eventPerson) {
-        LatLng latLng = new LatLng(mapViewModel.getSelectedEvent().getLatitude(), mapViewModel.getSelectedEvent().getLongitude());
-        setTextView(eventPerson);
-
-        createLines(mapViewModel.getSelectedEvent());
-    }
-
-    private void setTextView(Person eventPerson) {
-        if (filteredEvents.contains(mapViewModel.getSelectedEvent())) {
-            personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
-            location.setText(getString(R.string.location_name, mapViewModel.getSelectedEvent().getEventType().toUpperCase(),
-                    mapViewModel.getSelectedEvent().getCity(), mapViewModel.getSelectedEvent().getCountry()));
-
-            String personGender = eventPerson.getGender();
-
-            switch (personGender) {
-                case "m":
-                    Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
-                            colorRes(R.color.male_icon).sizeDp(40);
-                    genderImageView.setImageDrawable(maleIcon);
-                    break;
-                case "f":
-                    Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
-                            colorRes(R.color.female_icon).sizeDp(40);
-                    genderImageView.setImageDrawable(femaleIcon);
-            }
-        }
-        else {
-            resetTextView();
-        }
-    }
-
-    private void resetTextView() {
-        Drawable androidIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_android).
-                colorRes(R.color.android_icon).sizeDp(40);
-        genderImageView.setImageDrawable(androidIcon);
-
-        personName.setText(getString(R.string.await_click));
-        location.setText("");
-    }
-
     private void placeMarkers() {
         filteredEvents = getFilteredEvents();
+        dataCache.setFilteredEvents(filteredEvents);
 
         for (Event event : filteredEvents) {
             float markerColor = decideColor(event.getEventType());
@@ -408,6 +371,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 .width(width));
 
         lines.add(line);
+    }
+
+    private void setTextView(Person eventPerson) {
+        if (filteredEvents.contains(mapViewModel.getSelectedEvent())) {
+            personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
+            location.setText(getString(R.string.location_name, mapViewModel.getSelectedEvent().getEventType().toUpperCase(),
+                    mapViewModel.getSelectedEvent().getCity(), mapViewModel.getSelectedEvent().getCountry()));
+
+            String personGender = eventPerson.getGender();
+
+            switch (personGender) {
+                case "m":
+                    Drawable maleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_male).
+                            colorRes(R.color.male_icon).sizeDp(40);
+                    genderImageView.setImageDrawable(maleIcon);
+                    break;
+                case "f":
+                    Drawable femaleIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_female).
+                            colorRes(R.color.female_icon).sizeDp(40);
+                    genderImageView.setImageDrawable(femaleIcon);
+            }
+        }
+        else {
+            resetTextView();
+        }
+    }
+
+    private void resetTextView() {
+        Drawable androidIcon = new IconDrawable(getActivity(), FontAwesomeIcons.fa_android).
+                colorRes(R.color.android_icon).sizeDp(40);
+        genderImageView.setImageDrawable(androidIcon);
+
+        personName.setText(getString(R.string.await_click));
+        location.setText("");
     }
 
     private void removeLines() {

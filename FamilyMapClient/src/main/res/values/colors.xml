@@ -19,5 +19,8 @@
     <color name="baptism_color">#00FFFF</color>
     <color name="retirement_color">#FF00FF</color>
     <color name="first_kiss_color">#FF007F</color>
-    <color name="default_color">#00FF00</color>
+    <color name="green_color">#00FF00</color>
+    <color name="azure_color">#007FFF</color>
+    <color name="orange_color">#FFA500</color>
+    <color name="violet_color">#8F00FF</color>
 </resources>

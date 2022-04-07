@@ -104,4 +104,9 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
         searchMenuItem.setVisible(true);
         settingsMenuItem.setVisible(true);
     }
+
+    @Override
+    public void onBackPressed() {
+        //do nothing
+    }
 }

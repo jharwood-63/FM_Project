@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -49,6 +50,23 @@ public class PersonActivity extends AppCompatActivity {
         ExpandableListView expandableListView = findViewById(R.id.expandableListView);
 
         expandableListView.setAdapter(new ExpandableListAdapter(personID));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(getString(R.string.login_key), true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        //do nothing
     }
 
     private String getGenderString(String gender) {
@@ -148,7 +166,7 @@ public class PersonActivity extends AppCompatActivity {
             switch (groupPosition) {
                 case EVENT_GROUP_POSITION:
                     itemView = getLayoutInflater().inflate(R.layout.life_event_item, parent, false);
-                    //FIXME: CALL AN INITIALIZE FUNCTION FOR EVENTS
+                    initializeLifeEventView(itemView, childPosition);
                     break;
                 case FAMILY_GROUP_POSITION:
                     itemView = getLayoutInflater().inflate(R.layout.family_item, parent, false);
@@ -173,7 +191,15 @@ public class PersonActivity extends AppCompatActivity {
             eventDescription.setText(getString(R.string.event_description, event.getEventType().toUpperCase(), event.getCity(),
                     event.getCountry(), String.valueOf(event.getYear())));
             //set the event person name
+            TextView eventPerson = lifeEventItemView.findViewById(R.id.eventPerson);
+            eventPerson.setText(getString(R.string.family_person, person.getFirstName(), person.getLastName()));
             //set an onClickListener
+            lifeEventItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //go to event view
+                }
+            });
         }
 
         private void initializeFamilyView(View familyItemView, final int childPosition) {
@@ -190,22 +216,22 @@ public class PersonActivity extends AppCompatActivity {
         float color;
 
         if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = DataCache.BIRTH_COLOR;
+            color = getResources().getColor(R.color.birth_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = DataCache.MARRIAGE_COLOR;
+            color = getResources().getColor(R.color.marriage_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = DataCache.DEATH_COLOR;
+            color = getResources().getColor(R.color.death_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = DataCache.BAPTISM_COLOR;
+            color = getResources().getColor(R.color.baptism_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = DataCache.RETIREMENT_COLOR;
+            color = getResources().getColor(R.color.retirement_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = DataCache.FIRST_KISS_COLOR;
+            color = getResources().getColor(R.color.first_kiss_color);
         }
         else {
             color = decideOtherColor(eventType);
@@ -215,16 +241,9 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     private float decideOtherColor(String eventType) {
-        Map<String, Float> newColors = dataCache.getOtherColors();
-        dataCache.incrementColorIndex();
+        Map<String, Float> newColors = dataCache.getResourceColors();
 
-        if (dataCache.getOtherColors().containsKey(eventType)) {
-            return newColors.get(eventType);
-        }
-        else {
-            dataCache.addToMap(eventType, DataCache.OTHER_COLORS[dataCache.getColorIndex()]);
-            return DataCache.OTHER_COLORS[dataCache.getColorIndex()];
-        }
+        return newColors.get(eventType);
     }
 
     private Map<String, Person> getImmediateFamily(String personID) {
@@ -260,6 +279,21 @@ public class PersonActivity extends AppCompatActivity {
             }
         }
 
+        sortEvents(usedEvents);
+
         return usedEvents;
+    }
+
+    private void sortEvents(List<Event> usedEvents) {
+        Event temp;
+        for (int i = 0; i < usedEvents.size(); i++) {
+            for (int j = 1; j < usedEvents.size() - i; j++) {
+                if (usedEvents.get(j-1).getYear() > usedEvents.get(j).getYear()) {
+                    temp = usedEvents.get(j-1);
+                    usedEvents.set(j-1, usedEvents.get(j));
+                    usedEvents.set(j, temp);
+                }
+            }
+        }
     }
 }

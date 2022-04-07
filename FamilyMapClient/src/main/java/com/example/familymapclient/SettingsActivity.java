@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import data.DataCache;
 import viewmodels.SettingsActivityViewModel;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -119,7 +120,13 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        //do nothing
+    }
+
     private void logout() {
+        DataCache.getInstance().clearData();
         Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
         intent.putExtra(getString(R.string.login_key), false);
         startActivity(intent);

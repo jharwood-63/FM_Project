@@ -2,6 +2,7 @@ package data;
 
 import android.util.Log;
 
+import com.example.familymapclient.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class DataCache {
     public static final float RETIREMENT_COLOR = BitmapDescriptorFactory.HUE_MAGENTA;
     public static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
     public static final float[] OTHER_COLORS = new float[]{BitmapDescriptorFactory.HUE_GREEN, BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_VIOLET};
+    public static final float[] RESOURCE_COLORS = new float[]{R.color.green_color, R.color.azure_color, R.color.orange_color, R.color.violet_color};
 
     private static DataCache instance;
 
@@ -43,7 +45,8 @@ public class DataCache {
     private String personUrl;
     private String eventUrl;
 
-    private Map<String, Float> otherColors = new HashMap<>();
+    private final Map<String, Float> otherColors = new HashMap<>();
+    private final Map<String, Float> resourceColors = new HashMap<>();
     private int colorIndex;
 
     private final Map<String, Person> personById = new HashMap<>();
@@ -179,12 +182,36 @@ public class DataCache {
         eventUrl = "http://" + serverHost + ":" + serverPort + "/event";
     }
 
+    public void clearData() {
+        authToken = null;
+        userPersonID = null;
+
+        colorIndex = 0;
+
+        personById.clear();
+        eventById.clear();
+
+        personEvents.clear();
+
+        filteredEvents.clear();
+
+        paternalMales.clear();
+        paternalFemales.clear();
+        maternalMales.clear();
+        maternalFemales.clear();
+    }
+
     public Map<String, Float> getOtherColors() {
         return otherColors;
     }
 
-    public void addToMap(String eventType, float color) {
+    public Map<String, Float> getResourceColors() {
+        return resourceColors;
+    }
+
+    public void addColorToMap(String eventType, float color) {
         otherColors.put(eventType, color);
+        resourceColors.put(eventType, RESOURCE_COLORS[colorIndex]);
     }
 
     public int getColorIndex() {

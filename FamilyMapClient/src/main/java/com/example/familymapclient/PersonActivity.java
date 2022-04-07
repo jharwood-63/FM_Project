@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
@@ -44,8 +43,8 @@ public class PersonActivity extends AppCompatActivity {
         private static final int EVENT_GROUP_POSITION = 0;
         private static final int FAMILY_GROUP_POSITION = 1;
 
-        private Map<String, Person> immediateFamily;
-        private Set<Event> usedEvents;
+        private final Map<String, Person> immediateFamily;
+        private final Set<Event> usedEvents;
 
         ExpandableListAdapter(String personID) {
             Set<Event> filteredEvents = dataCache.getFilteredEvents();

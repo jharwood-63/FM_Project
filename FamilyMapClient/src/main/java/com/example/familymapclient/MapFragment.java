@@ -1,5 +1,6 @@
 package com.example.familymapclient;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Build;
@@ -81,7 +82,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             public void onClick(View view) {
                 if (mapViewModel.getSelectedEvent() != null) {
                     //switch fragments, pass the data that it needs
-                    //should not switch if no marker is selected
+                    Intent intent = new Intent(getActivity(), PersonActivity.class);
+                    intent.putExtra("personID", mapViewModel.getSelectedEvent().getPersonID());
+                    startActivity(intent);
                 }
             }
         });

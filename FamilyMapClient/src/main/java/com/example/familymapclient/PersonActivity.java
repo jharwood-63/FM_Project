@@ -11,8 +11,10 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,15 +31,35 @@ public class PersonActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
 
-        Intent intent = getIntent();
-        String personID = intent.getStringExtra("personID");
-
-        ExpandableListView expandableListView = findViewById(R.id.expandableListView);
-
         dataCache = DataCache.getInstance();
         personById = dataCache.getPersonById();
 
+        Intent intent = getIntent();
+        String personID = intent.getStringExtra("personID");
+        Person person = personById.get(personID);
+
+        TextView firstNameView = (TextView) findViewById(R.id.firstName);
+        TextView lastNameView = (TextView) findViewById(R.id.lastName);
+        TextView genderView = (TextView) findViewById(R.id.personGender);
+
+        firstNameView.setText(getString(R.string.personFirst, person.getFirstName()));
+        lastNameView.setText(getString(R.string.personLast, person.getLastName()));
+        genderView.setText(getString(R.string.personGender, getGenderString(person.getGender())));
+
+        ExpandableListView expandableListView = findViewById(R.id.expandableListView);
+
         expandableListView.setAdapter(new ExpandableListAdapter(personID));
+    }
+
+    private String getGenderString(String gender) {
+        switch (gender) {
+            case "m":
+                return "Male";
+            case "f":
+                return "Female";
+            default:
+                throw new IllegalArgumentException("Invalid gender: " + gender);
+        }
     }
 
     private class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -45,7 +67,7 @@ public class PersonActivity extends AppCompatActivity {
         private static final int FAMILY_GROUP_POSITION = 1;
 
         private final Map<String, Person> immediateFamily;
-        private final Set<Event> usedEvents;
+        private final List<Event> usedEvents;
         private String personID;
 
         ExpandableListAdapter(String personID) {
@@ -140,11 +162,16 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private void initializeLifeEventView(View lifeEventItemView, final int childPosition) {
+            Person person = personById.get(personID);
+            Event event = usedEvents.get(childPosition);
             //set the marker color
             ImageView marker = lifeEventItemView.findViewById(R.id.eventMarker);
-
-            //marker.setColorFilter(decideColor());
+            int color = (int) decideColor(event.getEventType());
+            marker.setColorFilter(color);
             //set the event description
+            TextView eventDescription = lifeEventItemView.findViewById(R.id.eventDescription);
+            eventDescription.setText(getString(R.string.event_description, event.getEventType().toUpperCase(), event.getCity(),
+                    event.getCountry(), String.valueOf(event.getYear())));
             //set the event person name
             //set an onClickListener
         }
@@ -222,9 +249,9 @@ public class PersonActivity extends AppCompatActivity {
         return null;
     }
 
-    private Set<Event> getUsedEvents(Set<Event> filteredEvents, String personID) {
+    private List<Event> getUsedEvents(Set<Event> filteredEvents, String personID) {
         Map<String, Event> eventById = dataCache.getEventById();
-        Set<Event> usedEvents = new HashSet<>();
+        List<Event> usedEvents = new ArrayList<>();
 
         for (Map.Entry<String, Event> eventEntry : eventById.entrySet()) {
             Event event = eventEntry.getValue();

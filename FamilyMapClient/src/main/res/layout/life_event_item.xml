@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/eventMarker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/ic_marker"
         android:contentDescription="@string/marker_descriptor"
         android:layout_alignParentStart="true"

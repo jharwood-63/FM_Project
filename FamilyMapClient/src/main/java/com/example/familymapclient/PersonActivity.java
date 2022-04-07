@@ -3,6 +3,7 @@ package com.example.familymapclient;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,15 +88,17 @@ public class PersonActivity extends AppCompatActivity {
         private static final int EVENT_GROUP_POSITION = 0;
         private static final int FAMILY_GROUP_POSITION = 1;
 
-        private final Map<String, Person> immediateFamily;
+        private final List<Person> immediateFamily;
         private final List<Event> usedEvents;
-        private String personID;
+        private final Map<Integer, String> immediateFamilyMap = new HashMap<>();
+        private final String personID;
 
         ExpandableListAdapter(String personID) {
             Set<Event> filteredEvents = dataCache.getFilteredEvents();
             usedEvents = getUsedEvents(filteredEvents, personID);
             immediateFamily = getImmediateFamily(personID);
             this.personID = personID;
+            setImmediateFamilyMap();
         }
 
         @Override
@@ -203,97 +209,129 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private void initializeFamilyView(View familyItemView, final int childPosition) {
+            Person familyMember = immediateFamily.get(childPosition);
+            String relationShip = immediateFamilyMap.get(childPosition);
 
+            ImageView genderMarker = (ImageView) familyItemView.findViewById(R.id.genderMarker);
+            genderMarker.setImageDrawable(getIcon(familyMember.getGender()));
+
+
+        }
+
+        private Drawable getIcon(String gender) {
+            Drawable icon;
+
+            switch (gender) {
+                case "m":
+                    icon = new IconDrawable(PersonActivity.this, FontAwesomeIcons.fa_male).
+                            colorRes(R.color.male_icon).sizeDp(40);
+                    break;
+                case "f":
+                    icon = new IconDrawable(PersonActivity.this, FontAwesomeIcons.fa_female).
+                            colorRes(R.color.female_icon).sizeDp(40);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid gender: " + gender);
+            }
+
+            return icon;
         }
 
         @Override
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
         }
-    }
 
-    private float decideColor(String eventType) {
-        float color;
+        private float decideColor(String eventType) {
+            float color;
 
-        if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = getResources().getColor(R.color.birth_color);
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = getResources().getColor(R.color.marriage_color);
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = getResources().getColor(R.color.death_color);
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = getResources().getColor(R.color.baptism_color);
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = getResources().getColor(R.color.retirement_color);
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = getResources().getColor(R.color.first_kiss_color);
-        }
-        else {
-            color = decideOtherColor(eventType);
-        }
-
-        return color;
-    }
-
-    private float decideOtherColor(String eventType) {
-        Map<String, Float> newColors = dataCache.getResourceColors();
-
-        return newColors.get(eventType);
-    }
-
-    private Map<String, Person> getImmediateFamily(String personID) {
-        Map<String, Person> immediateFamily = new HashMap<>();
-        Person person = personById.get(personID);
-
-        immediateFamily.put("Father", personById.get(person.getFatherID()));
-        immediateFamily.put("Mother", personById.get(person.getMotherID()));
-        immediateFamily.put("Spouse", personById.get(person.getSpouseID()));
-        immediateFamily.put("Child", getChild(person));
-
-        return immediateFamily;
-    }
-
-    private Person getChild(Person person) {
-        for (Map.Entry<String, Person> personEntry : personById.entrySet()) {
-            if (personEntry.getValue().getMotherID().equals(person.getPersonID()) || personEntry.getValue().getFatherID().equals(person.getPersonID())) {
-                return personEntry.getValue();
+            if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
+                color = getResources().getColor(R.color.birth_color);
             }
-        }
-
-        return null;
-    }
-
-    private List<Event> getUsedEvents(Set<Event> filteredEvents, String personID) {
-        Map<String, Event> eventById = dataCache.getEventById();
-        List<Event> usedEvents = new ArrayList<>();
-
-        for (Map.Entry<String, Event> eventEntry : eventById.entrySet()) {
-            Event event = eventEntry.getValue();
-            if (filteredEvents.contains(event) && event.getPersonID().equals(personID)) {
-                usedEvents.add(event);
+            else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
+                color = getResources().getColor(R.color.marriage_color);
             }
+            else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
+                color = getResources().getColor(R.color.death_color);
+            }
+            else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
+                color = getResources().getColor(R.color.baptism_color);
+            }
+            else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
+                color = getResources().getColor(R.color.retirement_color);
+            }
+            else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
+                color = getResources().getColor(R.color.first_kiss_color);
+            }
+            else {
+                color = decideOtherColor(eventType);
+            }
+
+            return color;
         }
 
-        sortEvents(usedEvents);
+        private float decideOtherColor(String eventType) {
+            Map<String, Float> newColors = dataCache.getResourceColors();
 
-        return usedEvents;
-    }
+            return newColors.get(eventType);
+        }
 
-    private void sortEvents(List<Event> usedEvents) {
-        Event temp;
-        for (int i = 0; i < usedEvents.size(); i++) {
-            for (int j = 1; j < usedEvents.size() - i; j++) {
-                if (usedEvents.get(j-1).getYear() > usedEvents.get(j).getYear()) {
-                    temp = usedEvents.get(j-1);
-                    usedEvents.set(j-1, usedEvents.get(j));
-                    usedEvents.set(j, temp);
+        private List<Person> getImmediateFamily(String personID) {
+            List<Person> immediateFamily = new ArrayList<>();
+            Person person = personById.get(personID);
+
+            immediateFamily.add(personById.get(person.getFatherID()));
+            immediateFamily.add(personById.get(person.getMotherID()));
+            immediateFamily.add(personById.get(person.getSpouseID()));
+            immediateFamily.add(getChild(person));
+
+            return immediateFamily;
+        }
+
+        private Person getChild(Person person) {
+            for (Map.Entry<String, Person> personEntry : personById.entrySet()) {
+                if (personEntry.getValue().getMotherID().equals(person.getPersonID()) || personEntry.getValue().getFatherID().equals(person.getPersonID())) {
+                    return personEntry.getValue();
                 }
             }
+
+            return null;
+        }
+
+        private List<Event> getUsedEvents(Set<Event> filteredEvents, String personID) {
+            Map<String, Event> eventById = dataCache.getEventById();
+            List<Event> usedEvents = new ArrayList<>();
+
+            for (Map.Entry<String, Event> eventEntry : eventById.entrySet()) {
+                Event event = eventEntry.getValue();
+                if (filteredEvents.contains(event) && event.getPersonID().equals(personID)) {
+                    usedEvents.add(event);
+                }
+            }
+
+            sortEvents(usedEvents);
+
+            return usedEvents;
+        }
+
+        private void sortEvents(List<Event> usedEvents) {
+            Event temp;
+            for (int i = 0; i < usedEvents.size(); i++) {
+                for (int j = 1; j < usedEvents.size() - i; j++) {
+                    if (usedEvents.get(j-1).getYear() > usedEvents.get(j).getYear()) {
+                        temp = usedEvents.get(j-1);
+                        usedEvents.set(j-1, usedEvents.get(j));
+                        usedEvents.set(j, temp);
+                    }
+                }
+            }
+        }
+
+        private void setImmediateFamilyMap() {
+            immediateFamilyMap.put(0, "Father");
+            immediateFamilyMap.put(1, "Mother");
+            immediateFamilyMap.put(2, "Spouse");
+            immediateFamilyMap.put(3, "Child");
         }
     }
 }

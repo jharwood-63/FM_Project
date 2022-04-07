@@ -56,7 +56,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
-    private Set<Event> filteredEvents = dataCache.getFilteredEvents();
+    private Set<Event> filteredEvents = new HashSet<>();
     private final Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
     private final MapViewModel mapViewModel = MapViewModel.getInstance();
@@ -143,7 +143,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         dataCache.setFilteredEvents(filteredEvents);
 
         for (Event event : filteredEvents) {
-            float markerColor = decideColor(event.getEventType());
+            int markerColor = decideColor(event.getEventType());
 
             Marker marker = mapViewModel.getMap().addMarker(new MarkerOptions().
                     position(new LatLng(event.getLatitude(), event.getLongitude())).
@@ -225,36 +225,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private float decideColor(String eventType) {
-        float color;
+    private int decideColor(String eventType) {
+        int color;
 
         if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = BIRTH_COLOR;
+            color = this.getResources().getColor(R.color.birth_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = MARRIAGE_COLOR;
+            color = this.getResources().getColor(R.color.marriage_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = DEATH_COLOR;
+            color = this.getResources().getColor(R.color.death_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = BAPTISM_COLOR;
+            color = this.getResources().getColor(R.color.baptism_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = RETIREMENT_COLOR;
+            color = this.getResources().getColor(R.color.retirement_color);
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = FIRST_KISS_COLOR;
+            color = this.getResources().getColor(R.color.first_kiss_color);
         }
         else {
-            color = DEFAULT_COLOR;
+            color = this.getResources().getColor(R.color.default_color);
         }
 
         return color;
     }
 
     private void createLines(Event selectedEvent) {
-        float color = getResources().getColor(R.color.spouse_line);
+        int color = getResources().getColor(R.color.spouse_line);
 
         if (filteredEvents.contains(selectedEvent)) {
             if (settingsActivityViewModel.isSpouseLinesEnabled()) {
@@ -274,8 +274,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Event[] sortedEvents = sortEvents(events);
 
                 color = getResources().getColor(R.color.life_line);
-                if (filteredEvents.contains(sortedEvents[0])) {
-                    drawLine(sortedEvents[0], sortedEvents[1], color, 10);
+                if (sortedEvents.length > 1) {
+                    if (filteredEvents.contains(sortedEvents[0]) && filteredEvents.contains(sortedEvents[1])) {
+                        drawLine(sortedEvents[0], sortedEvents[1], color, 10);
+                    }
                 }
 
                 for (int i = 1; i < sortedEvents.length; i++) {
@@ -317,11 +319,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             Event motherBirthEvent = findEvent(motherEvents, getString(R.string.birth_event));
 
             if (fatherBirthEvent != null && motherBirthEvent != null) {
-                float color = getResources().getColor(R.color.family_line);
-
                 if (filteredEvents.contains(startEvent)) {
-                    drawLine(startEvent, fatherBirthEvent, color, lineWidth);
-                    drawLine(startEvent, motherBirthEvent, color, lineWidth);
+                    int color = getResources().getColor(R.color.family_line);
+
+                    if (filteredEvents.contains(fatherBirthEvent)) {
+                        drawLine(startEvent, fatherBirthEvent, color, lineWidth);
+                    }
+
+                    if (filteredEvents.contains(motherBirthEvent)) {
+                        drawLine(startEvent, motherBirthEvent, color, lineWidth);
+                    }
                 }
 
                 drawFamilyLines(father, fatherBirthEvent, lineWidth - 3);
@@ -358,16 +365,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return sortedEvents;
     }
 
-    private void drawLine(Event startEvent, Event endEvent, float lineColor, float width) {
+    private void drawLine(Event startEvent, Event endEvent, int lineColor, float width) {
         LatLng startPoint = new LatLng(startEvent.getLatitude(), startEvent.getLongitude());
         LatLng endPoint = new LatLng(endEvent.getLatitude(), endEvent.getLongitude());
-
-        int color = (int) lineColor;
 
         Polyline line = mapViewModel.getMap().addPolyline(new PolylineOptions()
                 .add(startPoint)
                 .add(endPoint)
-                .color(color)
+                .color(lineColor)
                 .width(width));
 
         lines.add(line);

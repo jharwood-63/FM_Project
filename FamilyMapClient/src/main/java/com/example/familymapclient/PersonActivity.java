@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -45,11 +46,13 @@ public class PersonActivity extends AppCompatActivity {
 
         private final Map<String, Person> immediateFamily;
         private final Set<Event> usedEvents;
+        private String personID;
 
         ExpandableListAdapter(String personID) {
             Set<Event> filteredEvents = dataCache.getFilteredEvents();
             usedEvents = getUsedEvents(filteredEvents, personID);
             immediateFamily = getImmediateFamily(personID);
+            this.personID = personID;
         }
 
         @Override
@@ -137,7 +140,12 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private void initializeLifeEventView(View lifeEventItemView, final int childPosition) {
-
+            //set the marker color
+            ImageView marker = lifeEventItemView.findViewById(R.id.eventMarker);
+            //marker.setColorFilter(decideColor());
+            //set the event description
+            //set the event person name
+            //set an onClickListener
         }
 
         private void initializeFamilyView(View familyItemView, final int childPosition) {
@@ -148,6 +156,34 @@ public class PersonActivity extends AppCompatActivity {
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
         }
+    }
+
+    private float decideColor(String eventType) {
+        float color;
+
+        if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
+            color = getResources().getColor(R.color.birth_color);
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
+            color = getResources().getColor(R.color.marriage_color);
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
+            color = getResources().getColor(R.color.death_color);
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
+            color = getResources().getColor(R.color.baptism_color);
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
+            color = getResources().getColor(R.color.retirement_color);
+        }
+        else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
+            color = getResources().getColor(R.color.first_kiss_color);
+        }
+        else {
+            color = getResources().getColor(R.color.default_color);
+        }
+
+        return color;
     }
 
     private Map<String, Person> getImmediateFamily(String personID) {

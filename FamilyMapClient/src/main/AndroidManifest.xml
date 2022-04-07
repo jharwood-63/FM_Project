@@ -16,10 +16,15 @@
         android:theme="@style/Theme.FamilyMapClient"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/settings_name"
-            android:parentActivityName=".MainActivity"
+            android:name=".PersonActivity"
+            android:label="@string/person_activity_name"
             android:exported="false" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_name"
+            android:parentActivityName=".MainActivity" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />

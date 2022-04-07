@@ -87,8 +87,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapTextLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //switch fragments, pass the data that it needs
-                //should not switch if no marker is selected
+                if (mapViewModel.getSelectedEvent() != null) {
+                    //switch fragments, pass the data that it needs
+                    //should not switch if no marker is selected
+                }
             }
         });
 

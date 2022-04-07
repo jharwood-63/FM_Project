@@ -5,9 +5,12 @@
       <map>
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/drawable/ic_tableDivider_background.xml" value="0.182" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/activity_person.xml" value="0.25" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/activity_settings.xml" value="0.25" />
+        <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/family_item.xml" value="0.12132725430597771" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/fragment_login.xml" value="0.264" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/fragment_map.xml" value="0.264" />
+        <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/life_event_item.xml" value="0.176" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/layout/login.xml" value="0.25" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/menu/back_button.xml" value="0.25" />
         <entry key="..\:/Users/jharw/CS240/FamilyMapClient/FamilyMapClient/src/main/res/menu/main_menu.xml" value="0.11574074074074074" />

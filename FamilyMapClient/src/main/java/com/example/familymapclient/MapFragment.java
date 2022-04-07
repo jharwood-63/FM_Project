@@ -46,14 +46,6 @@ import viewmodels.SettingsActivityViewModel;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
-    private static final float BIRTH_COLOR = BitmapDescriptorFactory.HUE_BLUE;
-    private static final float MARRIAGE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
-    private static final float DEATH_COLOR = BitmapDescriptorFactory.HUE_RED;
-    private static final float BAPTISM_COLOR = BitmapDescriptorFactory.HUE_CYAN;
-    private static final float RETIREMENT_COLOR = BitmapDescriptorFactory.HUE_MAGENTA;
-    private static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
-    private static final float DEFAULT_COLOR = BitmapDescriptorFactory.HUE_GREEN;
-
     private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
     private Set<Event> filteredEvents = new HashSet<>();
@@ -143,7 +135,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         dataCache.setFilteredEvents(filteredEvents);
 
         for (Event event : filteredEvents) {
-            int markerColor = decideColor(event.getEventType());
+            float markerColor = decideColor(event.getEventType());
 
             Marker marker = mapViewModel.getMap().addMarker(new MarkerOptions().
                     position(new LatLng(event.getLatitude(), event.getLongitude())).
@@ -225,32 +217,45 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private int decideColor(String eventType) {
-        int color;
+    private float decideColor(String eventType) {
+        float color;
 
         if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = this.getResources().getColor(R.color.birth_color);
+            color = DataCache.BIRTH_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = this.getResources().getColor(R.color.marriage_color);
+            color = DataCache.MARRIAGE_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = this.getResources().getColor(R.color.death_color);
+            color = DataCache.DEATH_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = this.getResources().getColor(R.color.baptism_color);
+            color = DataCache.BAPTISM_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = this.getResources().getColor(R.color.retirement_color);
+            color = DataCache.RETIREMENT_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = this.getResources().getColor(R.color.first_kiss_color);
+            color = DataCache.FIRST_KISS_COLOR;
         }
         else {
-            color = this.getResources().getColor(R.color.default_color);
+            color = decideOtherColor(eventType);
         }
 
         return color;
+    }
+
+    private float decideOtherColor(String eventType) {
+        Map<String, Float> newColors = dataCache.getOtherColors();
+        dataCache.incrementColorIndex();
+
+        if (dataCache.getOtherColors().containsKey(eventType)) {
+            return newColors.get(eventType);
+        }
+        else {
+            dataCache.addToMap(eventType, DataCache.OTHER_COLORS[dataCache.getColorIndex()]);
+            return DataCache.OTHER_COLORS[dataCache.getColorIndex()];
+        }
     }
 
     private void createLines(Event selectedEvent) {

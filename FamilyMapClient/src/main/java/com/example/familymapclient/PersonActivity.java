@@ -142,6 +142,7 @@ public class PersonActivity extends AppCompatActivity {
         private void initializeLifeEventView(View lifeEventItemView, final int childPosition) {
             //set the marker color
             ImageView marker = lifeEventItemView.findViewById(R.id.eventMarker);
+
             //marker.setColorFilter(decideColor());
             //set the event description
             //set the event person name
@@ -162,28 +163,41 @@ public class PersonActivity extends AppCompatActivity {
         float color;
 
         if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = getResources().getColor(R.color.birth_color);
+            color = DataCache.BIRTH_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = getResources().getColor(R.color.marriage_color);
+            color = DataCache.MARRIAGE_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = getResources().getColor(R.color.death_color);
+            color = DataCache.DEATH_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = getResources().getColor(R.color.baptism_color);
+            color = DataCache.BAPTISM_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = getResources().getColor(R.color.retirement_color);
+            color = DataCache.RETIREMENT_COLOR;
         }
         else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = getResources().getColor(R.color.first_kiss_color);
+            color = DataCache.FIRST_KISS_COLOR;
         }
         else {
-            color = getResources().getColor(R.color.default_color);
+            color = decideOtherColor(eventType);
         }
 
         return color;
+    }
+
+    private float decideOtherColor(String eventType) {
+        Map<String, Float> newColors = dataCache.getOtherColors();
+        dataCache.incrementColorIndex();
+
+        if (dataCache.getOtherColors().containsKey(eventType)) {
+            return newColors.get(eventType);
+        }
+        else {
+            dataCache.addToMap(eventType, DataCache.OTHER_COLORS[dataCache.getColorIndex()]);
+            return DataCache.OTHER_COLORS[dataCache.getColorIndex()];
+        }
     }
 
     private Map<String, Person> getImmediateFamily(String personID) {

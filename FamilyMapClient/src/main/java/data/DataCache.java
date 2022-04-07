@@ -2,6 +2,8 @@ package data;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +16,14 @@ import result.EventResult;
 import result.PersonResult;
 
 public class DataCache {
+    public static final float BIRTH_COLOR = BitmapDescriptorFactory.HUE_BLUE;
+    public static final float MARRIAGE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
+    public static final float DEATH_COLOR = BitmapDescriptorFactory.HUE_RED;
+    public static final float BAPTISM_COLOR = BitmapDescriptorFactory.HUE_CYAN;
+    public static final float RETIREMENT_COLOR = BitmapDescriptorFactory.HUE_MAGENTA;
+    public static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
+    public static final float[] OTHER_COLORS = new float[]{BitmapDescriptorFactory.HUE_GREEN, BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_VIOLET};
+
     private static DataCache instance;
 
     //synchronized key word makes this thread safe
@@ -32,6 +42,9 @@ public class DataCache {
 
     private String personUrl;
     private String eventUrl;
+
+    private Map<String, Float> otherColors = new HashMap<>();
+    private int colorIndex;
 
     private final Map<String, Person> personById = new HashMap<>();
     private final Map<String, Event> eventById = new HashMap<>();
@@ -164,6 +177,27 @@ public class DataCache {
     public void setUrls(String serverHost, String serverPort) {
         personUrl = "http://" + serverHost + ":" + serverPort + "/person";
         eventUrl = "http://" + serverHost + ":" + serverPort + "/event";
+    }
+
+    public Map<String, Float> getOtherColors() {
+        return otherColors;
+    }
+
+    public void addToMap(String eventType, float color) {
+        otherColors.put(eventType, color);
+    }
+
+    public int getColorIndex() {
+        return colorIndex;
+    }
+
+    public void incrementColorIndex() {
+        if (colorIndex < 3) {
+            colorIndex++;
+        }
+        else {
+            colorIndex = 0;
+        }
     }
 
     public Set<Event> getFilteredEvents() {

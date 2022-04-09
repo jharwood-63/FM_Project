@@ -43,10 +43,13 @@ import data.DataCache;
 import model.Event;
 import model.Person;
 import viewmodels.MapViewModel;
+import viewmodels.PersonActivityViewModel;
 import viewmodels.SettingsActivityViewModel;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
+    private Event selectedEvent;
+    private GoogleMap map;
     private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
     private Set<Event> filteredEvents = new HashSet<>();
@@ -57,7 +60,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private TextView personName;
     private TextView location;
     private ImageView genderImageView;
-    private LinearLayout mapTextLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +69,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        selectedEvent = mapViewModel.getSelectedEvent();
 
         if (getArguments() != null) {
             Map<String, Event> eventById = dataCache.getEventById();
@@ -79,18 +83,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         personName = (TextView) view.findViewById(R.id.personNameText);
         location = (TextView) view.findViewById(R.id.locationNameText);
         genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
-        mapTextLayout = (LinearLayout) view.findViewById(R.id.mapTextLayout);
+        LinearLayout mapTextLayout = (LinearLayout) view.findViewById(R.id.mapTextLayout);
 
-        if (mapViewModel.getSelectedEvent() == null) {
+        if (selectedEvent == null) {
             resetTextView();
         }
 
         mapTextLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mapViewModel.getSelectedEvent() != null) {
+                if (selectedEvent != null) {
                     Intent intent = new Intent(getActivity(), PersonActivity.class);
-                    intent.putExtra("personID", mapViewModel.getSelectedEvent().getPersonID());
+                    intent.putExtra("personID", selectedEvent.getPersonID());
                     startActivity(intent);
                 }
             }
@@ -103,9 +107,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onResume() {
         super.onResume();
 
-        if (mapViewModel.getSelectedEvent() != null) {
-            Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
-            Event selectedEvent = mapViewModel.getSelectedEvent();
+        selectedEvent = mapViewModel.getSelectedEvent();
+
+        if (selectedEvent != null) {
+            Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
 
             resetMap(eventPerson, selectedEvent);
         }
@@ -116,21 +121,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        mapViewModel.setMap(googleMap);
-        mapViewModel.getMap().setOnMapLoadedCallback(this);
+        map = googleMap;
+        map.setOnMapLoadedCallback(this);
 
         placeMarkers();
 
-        mapViewModel.getMap().setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                mapViewModel.setSelectedEvent((Event) marker.getTag());
+                selectedEvent = (Event) marker.getTag();
+                mapViewModel.setSelectedEvent(selectedEvent);
 
-                Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
+                Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
                 removeLines();
-                createLines(mapViewModel.getSelectedEvent());
+                createLines(selectedEvent);
 
-                setTextView(eventPerson);
+                setTextView(eventPerson, selectedEvent);
 
                 return false;
             }
@@ -138,11 +144,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void resetMap(Person eventPerson, Event selectedEvent) {
-        mapViewModel.getMap().clear();
+        map.clear();
 
         placeMarkers();
 
-        setTextView(eventPerson);
+        setTextView(eventPerson, selectedEvent);
         createLines(selectedEvent);
     }
 
@@ -153,7 +159,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         for (Event event : filteredEvents) {
             float markerColor = decideColor(event.getEventType());
 
-            Marker marker = mapViewModel.getMap().addMarker(new MarkerOptions().
+            Marker marker = map.addMarker(new MarkerOptions().
                     position(new LatLng(event.getLatitude(), event.getLongitude())).
                     icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
 
@@ -363,7 +369,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         LatLng startPoint = new LatLng(startEvent.getLatitude(), startEvent.getLongitude());
         LatLng endPoint = new LatLng(endEvent.getLatitude(), endEvent.getLongitude());
 
-        Polyline line = mapViewModel.getMap().addPolyline(new PolylineOptions()
+        Polyline line = map.addPolyline(new PolylineOptions()
                 .add(startPoint)
                 .add(endPoint)
                 .color(lineColor)
@@ -372,11 +378,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         lines.add(line);
     }
 
-    private void setTextView(Person eventPerson) {
-        if (filteredEvents.contains(mapViewModel.getSelectedEvent())) {
+    private void setTextView(Person eventPerson, Event selectedEvent) {
+        if (filteredEvents.contains(selectedEvent)) {
             personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
-            location.setText(getString(R.string.location_name, mapViewModel.getSelectedEvent().getEventType().toUpperCase(),
-                    mapViewModel.getSelectedEvent().getCity(), mapViewModel.getSelectedEvent().getCountry()));
+            location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(),
+                    selectedEvent.getCity(), selectedEvent.getCountry()));
 
             String personGender = eventPerson.getGender();
 

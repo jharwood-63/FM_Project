@@ -29,12 +29,6 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchCompat maleEvents;
     private SwitchCompat femaleEvents;
 
-    /*
-    private SettingsActivityViewModel getViewModel() {
-        return new ViewModelProvider(this).get(SettingsActivityViewModel.class);
-    }
-     */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,13 +116,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        //do nothing
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(getString(R.string.login_key), true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void logout() {
         DataCache.getInstance().clearData();
         Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
         intent.putExtra(getString(R.string.login_key), false);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 

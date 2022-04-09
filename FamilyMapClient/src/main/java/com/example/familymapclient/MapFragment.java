@@ -81,7 +81,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onClick(View view) {
                 if (mapViewModel.getSelectedEvent() != null) {
-                    //switch fragments, pass the data that it needs
                     Intent intent = new Intent(getActivity(), PersonActivity.class);
                     intent.putExtra("personID", mapViewModel.getSelectedEvent().getPersonID());
                     startActivity(intent);

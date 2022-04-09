@@ -1,6 +1,7 @@
 package com.example.familymapclient;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -18,7 +19,6 @@ import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,10 +26,15 @@ import java.util.Set;
 import data.DataCache;
 import model.Event;
 import model.Person;
+import viewmodels.PersonActivityViewModel;
 
 public class PersonActivity extends AppCompatActivity {
     private DataCache dataCache;
-    Map<String, Person> personById;
+    private Map<String, Person> personById;
+
+    private PersonActivityViewModel getViewModel() {
+        return new ViewModelProvider(this).get(PersonActivityViewModel.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,19 +46,9 @@ public class PersonActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String personID = intent.getStringExtra("personID");
-        Person person = personById.get(personID);
+        getViewModel().setPersonID(personID);
 
-        TextView firstNameView = (TextView) findViewById(R.id.firstName);
-        TextView lastNameView = (TextView) findViewById(R.id.lastName);
-        TextView genderView = (TextView) findViewById(R.id.personGender);
-
-        firstNameView.setText(getString(R.string.personFirst, person.getFirstName()));
-        lastNameView.setText(getString(R.string.personLast, person.getLastName()));
-        genderView.setText(getString(R.string.personGender, getGenderString(person.getGender())));
-
-        ExpandableListView expandableListView = findViewById(R.id.expandableListView);
-
-        expandableListView.setAdapter(new ExpandableListAdapter(personID));
+        initializeExpandableListAdapter(personID);
     }
 
     @Override
@@ -69,8 +64,35 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        String personID = getViewModel().getPersonID();
+        initializeExpandableListAdapter(personID);
+    }
+
+    @Override
     public void onBackPressed() {
-        //do nothing
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(getString(R.string.login_key), true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    private void initializeExpandableListAdapter(String personID) {
+        Person person = personById.get(personID);
+
+        TextView firstNameView = (TextView) findViewById(R.id.firstName);
+        TextView lastNameView = (TextView) findViewById(R.id.lastName);
+        TextView genderView = (TextView) findViewById(R.id.personGender);
+
+        firstNameView.setText(getString(R.string.personFirst, person.getFirstName()));
+        lastNameView.setText(getString(R.string.personLast, person.getLastName()));
+        genderView.setText(getString(R.string.personGender, getGenderString(person.getGender())));
+
+        ExpandableListView expandableListView = findViewById(R.id.expandableListView);
+
+        expandableListView.setAdapter(new ExpandableListAdapter(personID));
     }
 
     private String getGenderString(String gender) {
@@ -188,18 +210,18 @@ public class PersonActivity extends AppCompatActivity {
         private void initializeLifeEventView(View lifeEventItemView, final int childPosition) {
             Person person = personById.get(personID);
             Event event = usedEvents.get(childPosition);
-            //set the marker color
+
             ImageView marker = lifeEventItemView.findViewById(R.id.eventMarker);
             int color = (int) decideColor(event.getEventType());
             marker.setColorFilter(color);
-            //set the event description
+
             TextView eventDescription = lifeEventItemView.findViewById(R.id.eventDescription);
             eventDescription.setText(getString(R.string.event_description, event.getEventType().toUpperCase(), event.getCity(),
                     event.getCountry(), String.valueOf(event.getYear())));
-            //set the event person name
+
             TextView eventPerson = lifeEventItemView.findViewById(R.id.eventPerson);
             eventPerson.setText(getString(R.string.family_person, person.getFirstName(), person.getLastName()));
-            //set an onClickListener
+
             lifeEventItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

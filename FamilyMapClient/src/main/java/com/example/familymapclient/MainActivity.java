@@ -41,10 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
                 fragment = createLoginFragment();
             }
             else {
-                //notifyDone();
                 fragment = new MapFragment();
-                //searchMenuItem.setVisible(true);
-                //settingsMenuItem.setVisible(true);
             }
 
             fragmentManager.beginTransaction()

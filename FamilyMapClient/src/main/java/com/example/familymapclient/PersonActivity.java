@@ -220,6 +220,15 @@ public class PersonActivity extends AppCompatActivity {
 
             TextView relationshipName = (TextView) familyItemView.findViewById(R.id.relationshipName);
             relationshipName.setText(getString(R.string.relationship_name, relationship));
+
+            familyItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(PersonActivity.this, PersonActivity.class);
+                    intent.putExtra("personID", familyMember.getPersonID());
+                    startActivity(intent);
+                }
+            });
         }
 
         private Drawable getIcon(String gender) {
@@ -247,9 +256,15 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private float decideColor(String eventType) {
-            Map<String, Float> newColors = dataCache.getResourceColors();
+            float[] resourceColors = new float[]{getResources().getColor(R.color.blue_color), getResources().getColor(R.color.yellow_color),
+                    getResources().getColor(R.color.red_color), getResources().getColor(R.color.cyan_color), getResources().getColor(R.color.magenta_color),
+                    getResources().getColor(R.color.rose_color), getResources().getColor(R.color.green_color), getResources().getColor(R.color.azure_color),
+                    getResources().getColor(R.color.orange_color), getResources().getColor(R.color.violet_color)};
 
-            return newColors.get(eventType);
+            Map<String, Integer> colors = dataCache.getResourceColors();
+            int index = colors.get(eventType);
+
+            return resourceColors[index];
         }
 
         private List<Person> getImmediateFamily(String personID) {

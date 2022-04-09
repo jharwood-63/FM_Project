@@ -20,9 +20,6 @@ public class DataCache {
     public static final float[] OTHER_COLORS = new float[]{BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_YELLOW, BitmapDescriptorFactory.HUE_RED,
             BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_ROSE, BitmapDescriptorFactory.HUE_GREEN,
             BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_VIOLET};
-    public static final float[] RESOURCE_COLORS = new float[]{R.color.blue_color, R.color.yellow_color, R.color.red_color, R.color.cyan_color, R.color.magenta_color,
-            R.color.rose_color, R.color.green_color, R.color.azure_color, R.color.orange_color, R.color.violet_color, R.color.green_color, R.color.azure_color,
-            R.color.orange_color, R.color.violet_color};
 
     private static DataCache instance;
 
@@ -44,7 +41,7 @@ public class DataCache {
     private String eventUrl;
 
     private final Map<String, Float> otherColors = new HashMap<>();
-    private final Map<String, Float> resourceColors = new HashMap<>();
+    private final Map<String, Integer> resourceColorIndices = new HashMap<>();
     private int colorIndex;
 
     private final Map<String, Person> personById = new HashMap<>();
@@ -203,13 +200,13 @@ public class DataCache {
         return otherColors;
     }
 
-    public Map<String, Float> getResourceColors() {
-        return resourceColors;
+    public Map<String, Integer> getResourceColors() {
+        return resourceColorIndices;
     }
 
-    public void addColorToMap(String eventType, float color, int oldColorIndex) {
-        otherColors.put(eventType, color);
-        resourceColors.put(eventType, RESOURCE_COLORS[oldColorIndex]);
+    public void addColorToMap(String eventType, int oldColorIndex) {
+        otherColors.put(eventType, OTHER_COLORS[oldColorIndex]);
+        resourceColorIndices.put(eventType, oldColorIndex);
     }
 
     public int getColorIndex() {

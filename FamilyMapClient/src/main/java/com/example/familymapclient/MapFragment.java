@@ -229,7 +229,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return newColors.get(eventType);
         }
         else {
-            dataCache.addColorToMap(eventType, DataCache.OTHER_COLORS[colorIndex], colorIndex);
+            dataCache.addColorToMap(eventType, colorIndex);
             return DataCache.OTHER_COLORS[colorIndex];
         }
     }

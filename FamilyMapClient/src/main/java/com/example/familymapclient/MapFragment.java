@@ -68,6 +68,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        if (getArguments() != null) {
+            Map<String, Event> eventById = dataCache.getEventById();
+            Event selectedEvent = eventById.get(getArguments().getString(getString(R.string.event_id)));
+
+            Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
+            resetMap(eventPerson, selectedEvent);
+        }
+
         personName = (TextView) view.findViewById(R.id.personNameText);
         location = (TextView) view.findViewById(R.id.locationNameText);
         genderImageView = (ImageView) view.findViewById(R.id.genderIcon);
@@ -97,12 +105,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (mapViewModel.getSelectedEvent() != null) {
             Person eventPerson = dataCache.getPerson(mapViewModel.getSelectedEvent().getPersonID());
-            mapViewModel.getMap().clear();
+            Event selectedEvent = mapViewModel.getSelectedEvent();
 
-            placeMarkers();
-
-            setTextView(eventPerson);
-            createLines(mapViewModel.getSelectedEvent());
+            resetMap(eventPerson, selectedEvent);
         }
     }
 
@@ -130,6 +135,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 return false;
             }
         });
+    }
+
+    private void resetMap(Person eventPerson, Event selectedEvent) {
+        mapViewModel.getMap().clear();
+
+        placeMarkers();
+
+        setTextView(eventPerson);
+        createLines(selectedEvent);
     }
 
     private void placeMarkers() {

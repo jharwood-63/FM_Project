@@ -225,7 +225,9 @@ public class PersonActivity extends AppCompatActivity {
             lifeEventItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //go to event view
+                    Intent intent = new Intent(PersonActivity.this, EventActivity.class);
+                    intent.putExtra(getString(R.string.event_id), event.getEventID());
+                    startActivity(intent);
                 }
             });
         }

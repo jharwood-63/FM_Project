@@ -176,7 +176,7 @@ public class PersonActivity extends AppCompatActivity {
                     break;
                 case FAMILY_GROUP_POSITION:
                     itemView = getLayoutInflater().inflate(R.layout.family_item, parent, false);
-                    //FIXME: CALL AN INITIALIZE FUNCTION FOR EVENTS
+                    initializeFamilyView(itemView, childPosition);
                     break;
                 default:
                     throw new IllegalArgumentException("Unrecognized group position: " + groupPosition);
@@ -210,12 +210,16 @@ public class PersonActivity extends AppCompatActivity {
 
         private void initializeFamilyView(View familyItemView, final int childPosition) {
             Person familyMember = immediateFamily.get(childPosition);
-            String relationShip = immediateFamilyMap.get(childPosition);
+            String relationship = immediateFamilyMap.get(childPosition);
 
             ImageView genderMarker = (ImageView) familyItemView.findViewById(R.id.genderMarker);
             genderMarker.setImageDrawable(getIcon(familyMember.getGender()));
 
+            TextView ancestorName = (TextView) familyItemView.findViewById(R.id.ancestorName);
+            ancestorName.setText(getString(R.string.family_person, familyMember.getFirstName(), familyMember.getLastName()));
 
+            TextView relationshipName = (TextView) familyItemView.findViewById(R.id.relationshipName);
+            relationshipName.setText(getString(R.string.relationship_name, relationship));
         }
 
         private Drawable getIcon(String gender) {
@@ -243,34 +247,6 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private float decideColor(String eventType) {
-            float color;
-
-            if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-                color = getResources().getColor(R.color.birth_color);
-            }
-            else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-                color = getResources().getColor(R.color.marriage_color);
-            }
-            else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-                color = getResources().getColor(R.color.death_color);
-            }
-            else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-                color = getResources().getColor(R.color.baptism_color);
-            }
-            else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-                color = getResources().getColor(R.color.retirement_color);
-            }
-            else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-                color = getResources().getColor(R.color.first_kiss_color);
-            }
-            else {
-                color = decideOtherColor(eventType);
-            }
-
-            return color;
-        }
-
-        private float decideOtherColor(String eventType) {
             Map<String, Float> newColors = dataCache.getResourceColors();
 
             return newColors.get(eventType);

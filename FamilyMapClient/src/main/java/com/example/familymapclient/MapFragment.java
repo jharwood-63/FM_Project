@@ -221,43 +221,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private float decideColor(String eventType) {
-        float color;
-
-        if (eventType.equalsIgnoreCase(getString(R.string.birth_event))) {
-            color = DataCache.BIRTH_COLOR;
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.marriage_event))) {
-            color = DataCache.MARRIAGE_COLOR;
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.death_event))) {
-            color = DataCache.DEATH_COLOR;
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.baptism_event))) {
-            color = DataCache.BAPTISM_COLOR;
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.retirement_event))) {
-            color = DataCache.RETIREMENT_COLOR;
-        }
-        else if (eventType.equalsIgnoreCase(getString(R.string.first_kiss_event))) {
-            color = DataCache.FIRST_KISS_COLOR;
-        }
-        else {
-            color = decideOtherColor(eventType);
-        }
-
-        return color;
-    }
-
-    private float decideOtherColor(String eventType) {
         Map<String, Float> newColors = dataCache.getOtherColors();
+        int colorIndex = dataCache.getColorIndex();
         dataCache.incrementColorIndex();
 
         if (dataCache.getOtherColors().containsKey(eventType)) {
             return newColors.get(eventType);
         }
         else {
-            dataCache.addColorToMap(eventType, DataCache.OTHER_COLORS[dataCache.getColorIndex()]);
-            return DataCache.OTHER_COLORS[dataCache.getColorIndex()];
+            dataCache.addColorToMap(eventType, DataCache.OTHER_COLORS[colorIndex], colorIndex);
+            return DataCache.OTHER_COLORS[colorIndex];
         }
     }
 

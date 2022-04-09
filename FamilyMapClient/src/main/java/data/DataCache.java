@@ -17,14 +17,12 @@ import result.EventResult;
 import result.PersonResult;
 
 public class DataCache {
-    public static final float BIRTH_COLOR = BitmapDescriptorFactory.HUE_BLUE;
-    public static final float MARRIAGE_COLOR = BitmapDescriptorFactory.HUE_YELLOW;
-    public static final float DEATH_COLOR = BitmapDescriptorFactory.HUE_RED;
-    public static final float BAPTISM_COLOR = BitmapDescriptorFactory.HUE_CYAN;
-    public static final float RETIREMENT_COLOR = BitmapDescriptorFactory.HUE_MAGENTA;
-    public static final float FIRST_KISS_COLOR = BitmapDescriptorFactory.HUE_ROSE;
-    public static final float[] OTHER_COLORS = new float[]{BitmapDescriptorFactory.HUE_GREEN, BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_VIOLET};
-    public static final float[] RESOURCE_COLORS = new float[]{R.color.green_color, R.color.azure_color, R.color.orange_color, R.color.violet_color};
+    public static final float[] OTHER_COLORS = new float[]{BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_YELLOW, BitmapDescriptorFactory.HUE_RED,
+            BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_ROSE, BitmapDescriptorFactory.HUE_GREEN,
+            BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_VIOLET};
+    public static final float[] RESOURCE_COLORS = new float[]{R.color.blue_color, R.color.yellow_color, R.color.red_color, R.color.cyan_color, R.color.magenta_color,
+            R.color.rose_color, R.color.green_color, R.color.azure_color, R.color.orange_color, R.color.violet_color, R.color.green_color, R.color.azure_color,
+            R.color.orange_color, R.color.violet_color};
 
     private static DataCache instance;
 
@@ -209,9 +207,9 @@ public class DataCache {
         return resourceColors;
     }
 
-    public void addColorToMap(String eventType, float color) {
+    public void addColorToMap(String eventType, float color, int oldColorIndex) {
         otherColors.put(eventType, color);
-        resourceColors.put(eventType, RESOURCE_COLORS[colorIndex]);
+        resourceColors.put(eventType, RESOURCE_COLORS[oldColorIndex]);
     }
 
     public int getColorIndex() {
@@ -219,7 +217,7 @@ public class DataCache {
     }
 
     public void incrementColorIndex() {
-        if (colorIndex < 3) {
+        if (colorIndex < OTHER_COLORS.length - 1) {
             colorIndex++;
         }
         else {

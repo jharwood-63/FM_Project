@@ -110,9 +110,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         selectedEvent = mapViewModel.getSelectedEvent();
 
-        if (activitySelectedEvent == null && selectedEvent != null) {
+        if (selectedEvent == null && activitySelectedEvent == null) {
+            resetMap(null, null);
+        }
+        else if (activitySelectedEvent == null) {
             Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
-
             resetMap(eventPerson, selectedEvent);
         }
     }
@@ -128,10 +130,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         placeMarkers();
 
         if (activitySelectedEvent != null) {
-            //center the camera
             Person eventPerson = dataCache.getPerson(activitySelectedEvent.getPersonID());
             createLines(activitySelectedEvent);
             setTextView(eventPerson, activitySelectedEvent);
+
+            LatLng latLng = new LatLng(activitySelectedEvent.getLatitude(), activitySelectedEvent.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         }
 
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -152,12 +156,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void resetMap(Person eventPerson, Event selectedEvent) {
-        map.clear();
+        if (map != null) {
+            map.clear();
+            placeMarkers();
+        }
 
-        placeMarkers();
-
-        setTextView(eventPerson, selectedEvent);
-        createLines(selectedEvent);
+        if (eventPerson != null) {
+            setTextView(eventPerson, selectedEvent);
+            createLines(selectedEvent);
+        }
+        else {
+            resetTextView();
+        }
     }
 
     private void placeMarkers() {
@@ -387,7 +397,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void setTextView(Person eventPerson, Event selectedEvent) {
-        if (selectedEvent != null) {
+        if (filteredEvents.contains(selectedEvent)) {
             personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
             location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(),
                     selectedEvent.getCity(), selectedEvent.getCountry()));

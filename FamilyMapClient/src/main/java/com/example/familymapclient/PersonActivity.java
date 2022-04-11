@@ -64,14 +64,6 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        String personID = getViewModel().getPersonID();
-        initializeExpandableListAdapter(personID);
-    }
-
-    @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(getString(R.string.login_key), true);
@@ -112,7 +104,7 @@ public class PersonActivity extends AppCompatActivity {
 
         private final List<Person> immediateFamily;
         private final List<Event> usedEvents;
-        private final Map<Integer, String> immediateFamilyMap = new HashMap<>();
+        private final Map<String, String> immediateFamilyMap = new HashMap<>();
         private final String personID;
 
         ExpandableListAdapter(String personID) {
@@ -120,7 +112,6 @@ public class PersonActivity extends AppCompatActivity {
             usedEvents = getUsedEvents(filteredEvents, personID);
             immediateFamily = getImmediateFamily(personID);
             this.personID = personID;
-            setImmediateFamilyMap();
         }
 
         @Override
@@ -234,7 +225,7 @@ public class PersonActivity extends AppCompatActivity {
 
         private void initializeFamilyView(View familyItemView, final int childPosition) {
             Person familyMember = immediateFamily.get(childPosition);
-            String relationship = immediateFamilyMap.get(childPosition);
+            String relationship = immediateFamilyMap.get(familyMember.getPersonID());
 
             ImageView genderMarker = (ImageView) familyItemView.findViewById(R.id.genderMarker);
             genderMarker.setImageDrawable(getIcon(familyMember.getGender()));
@@ -295,12 +286,84 @@ public class PersonActivity extends AppCompatActivity {
             List<Person> immediateFamily = new ArrayList<>();
             Person person = personById.get(personID);
 
-            immediateFamily.add(personById.get(person.getFatherID()));
-            immediateFamily.add(personById.get(person.getMotherID()));
-            immediateFamily.add(personById.get(person.getSpouseID()));
-            immediateFamily.add(getChild(person));
+            //this doesnt work if the id = "" so you need to set them all to null;
+            String fatherID = person.getFatherID();
+            String motherID = person.getMotherID();
+            String spouseID = person.getSpouseID();
+            Person child = getChild(person);
+
+            String fatherRelation = getString(R.string.father_relationship);
+            String motherRelation = getString(R.string.mother_relationship);
+            String spouseRelation = getString(R.string.spouse_relationship);
+            String childRelation = getString(R.string.child_relationship);
+
+            boolean isFatherMotherNull = isFatherMotherNull(fatherID, motherID);
+
+            if (!isFatherMotherNull && child != null && spouseID != null) {
+                immediateFamily.add(personById.get(fatherID));
+                addToImmediateFamilyMap(fatherID, fatherRelation);
+
+                immediateFamily.add(personById.get(motherID));
+                addToImmediateFamilyMap(motherID, motherRelation);
+
+                immediateFamily.add(personById.get(spouseID));
+                addToImmediateFamilyMap(spouseID, spouseRelation);
+
+                immediateFamily.add(child);
+                addToImmediateFamilyMap(child.getPersonID(), childRelation);
+            }
+            else if (isFatherMotherNull && child != null && spouseID != null) {
+                immediateFamily.add(personById.get(spouseID));
+                addToImmediateFamilyMap(spouseID, spouseRelation);
+
+                immediateFamily.add(child);
+                addToImmediateFamilyMap(child.getPersonID(), childRelation);
+            }
+            else if (isFatherMotherNull && child == null && spouseID != null) {
+                immediateFamily.add(personById.get(spouseID));
+                addToImmediateFamilyMap(spouseID, spouseRelation);
+            }
+            else if (isFatherMotherNull && spouseID == null && child != null) {
+                immediateFamily.add(getChild(person));
+                addToImmediateFamilyMap(child.getPersonID(), childRelation);
+            }
+            else if (child == null && !isFatherMotherNull && spouseID != null) {
+                immediateFamily.add(personById.get(fatherID));
+                addToImmediateFamilyMap(fatherID, fatherRelation);
+
+                immediateFamily.add(personById.get(motherID));
+                addToImmediateFamilyMap(motherID, motherRelation);
+
+                immediateFamily.add(personById.get(spouseID));
+                addToImmediateFamilyMap(spouseID, spouseRelation);
+            }
+            else if (child == null && spouseID == null && !isFatherMotherNull) {
+                immediateFamily.add(personById.get(fatherID));
+                addToImmediateFamilyMap(fatherID, fatherRelation);
+
+                immediateFamily.add(personById.get(motherID));
+                addToImmediateFamilyMap(motherID, motherRelation);
+            }
+            else if (spouseID == null && child != null && !isFatherMotherNull) {
+                immediateFamily.add(personById.get(fatherID));
+                addToImmediateFamilyMap(fatherID, fatherRelation);
+
+                immediateFamily.add(personById.get(motherID));
+                addToImmediateFamilyMap(motherID, motherRelation);
+
+                immediateFamily.add(child);
+                addToImmediateFamilyMap(child.getPersonID(), childRelation);
+            }
 
             return immediateFamily;
+        }
+
+        private boolean isFatherMotherNull(String fatherID, String motherID) {
+            return fatherID == null && motherID == null;
+        }
+
+        private void resetIDs(String fatherID, String motherID, String spouseID, String childID) {
+            //change any id that equals "" to equal null
         }
 
         private Person getChild(Person person) {
@@ -342,11 +405,8 @@ public class PersonActivity extends AppCompatActivity {
             }
         }
 
-        private void setImmediateFamilyMap() {
-            immediateFamilyMap.put(0, "Father");
-            immediateFamilyMap.put(1, "Mother");
-            immediateFamilyMap.put(2, "Spouse");
-            immediateFamilyMap.put(3, "Child");
+        private void addToImmediateFamilyMap(String personID, String relationship) {
+            immediateFamilyMap.put(personID, relationship);
         }
     }
 }

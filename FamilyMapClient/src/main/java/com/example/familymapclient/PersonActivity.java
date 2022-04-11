@@ -286,7 +286,6 @@ public class PersonActivity extends AppCompatActivity {
             List<Person> immediateFamily = new ArrayList<>();
             Person person = personById.get(personID);
 
-            //this doesnt work if the id = "" so you need to set them all to null;
             String fatherID = person.getFatherID();
             String motherID = person.getMotherID();
             String spouseID = person.getSpouseID();
@@ -298,8 +297,9 @@ public class PersonActivity extends AppCompatActivity {
             String childRelation = getString(R.string.child_relationship);
 
             boolean isFatherMotherNull = isFatherMotherNull(fatherID, motherID);
+            boolean isSpouseNull = isSpouseNull(spouseID);
 
-            if (!isFatherMotherNull && child != null && spouseID != null) {
+            if (!isFatherMotherNull && child != null && !isSpouseNull) {
                 immediateFamily.add(personById.get(fatherID));
                 addToImmediateFamilyMap(fatherID, fatherRelation);
 
@@ -312,39 +312,39 @@ public class PersonActivity extends AppCompatActivity {
                 immediateFamily.add(child);
                 addToImmediateFamilyMap(child.getPersonID(), childRelation);
             }
-            else if (isFatherMotherNull && child != null && spouseID != null) {
+            else if (isFatherMotherNull && child != null && !isSpouseNull) {
                 immediateFamily.add(personById.get(spouseID));
                 addToImmediateFamilyMap(spouseID, spouseRelation);
 
                 immediateFamily.add(child);
                 addToImmediateFamilyMap(child.getPersonID(), childRelation);
             }
-            else if (isFatherMotherNull && child == null && spouseID != null) {
+            else if (isFatherMotherNull && child == null && !isSpouseNull) {
                 immediateFamily.add(personById.get(spouseID));
                 addToImmediateFamilyMap(spouseID, spouseRelation);
             }
-            else if (isFatherMotherNull && spouseID == null && child != null) {
+            else if (child == null && !isFatherMotherNull && !isSpouseNull) {
+                immediateFamily.add(personById.get(fatherID));
+                addToImmediateFamilyMap(fatherID, fatherRelation);
+
+                immediateFamily.add(personById.get(motherID));
+                addToImmediateFamilyMap(motherID, motherRelation);
+
+                immediateFamily.add(personById.get(spouseID));
+                addToImmediateFamilyMap(spouseID, spouseRelation);
+            }
+            else if (isFatherMotherNull && isSpouseNull && child != null) {
                 immediateFamily.add(getChild(person));
                 addToImmediateFamilyMap(child.getPersonID(), childRelation);
             }
-            else if (child == null && !isFatherMotherNull && spouseID != null) {
-                immediateFamily.add(personById.get(fatherID));
-                addToImmediateFamilyMap(fatherID, fatherRelation);
-
-                immediateFamily.add(personById.get(motherID));
-                addToImmediateFamilyMap(motherID, motherRelation);
-
-                immediateFamily.add(personById.get(spouseID));
-                addToImmediateFamilyMap(spouseID, spouseRelation);
-            }
-            else if (child == null && spouseID == null && !isFatherMotherNull) {
+            else if (child == null && isSpouseNull && !isFatherMotherNull) {
                 immediateFamily.add(personById.get(fatherID));
                 addToImmediateFamilyMap(fatherID, fatherRelation);
 
                 immediateFamily.add(personById.get(motherID));
                 addToImmediateFamilyMap(motherID, motherRelation);
             }
-            else if (spouseID == null && child != null && !isFatherMotherNull) {
+            else if (isSpouseNull && child != null && !isFatherMotherNull) {
                 immediateFamily.add(personById.get(fatherID));
                 addToImmediateFamilyMap(fatherID, fatherRelation);
 
@@ -359,11 +359,11 @@ public class PersonActivity extends AppCompatActivity {
         }
 
         private boolean isFatherMotherNull(String fatherID, String motherID) {
-            return fatherID == null && motherID == null;
+            return (fatherID == null || fatherID.equals("")) && (motherID == null || motherID.equals(""));
         }
 
-        private void resetIDs(String fatherID, String motherID, String spouseID, String childID) {
-            //change any id that equals "" to equal null
+        private boolean isSpouseNull(String spouseID) {
+            return spouseID == null || spouseID.equals("");
         }
 
         private Person getChild(Person person) {

@@ -49,6 +49,7 @@ import viewmodels.SettingsActivityViewModel;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
     private Event selectedEvent;
+    private Event activitySelectedEvent;
     private GoogleMap map;
     private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
@@ -74,10 +75,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (getArguments() != null) {
             Map<String, Event> eventById = dataCache.getEventById();
-            Event selectedEvent = eventById.get(getArguments().getString(getString(R.string.event_id)));
-
-            Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
-            resetMap(eventPerson, selectedEvent);
+            activitySelectedEvent = eventById.get(getArguments().getString(getString(R.string.event_id)));
+        }
+        else {
+            activitySelectedEvent = null;
         }
 
         personName = (TextView) view.findViewById(R.id.personNameText);
@@ -109,7 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         selectedEvent = mapViewModel.getSelectedEvent();
 
-        if (selectedEvent != null) {
+        if (activitySelectedEvent == null && selectedEvent != null) {
             Person eventPerson = dataCache.getPerson(selectedEvent.getPersonID());
 
             resetMap(eventPerson, selectedEvent);
@@ -125,6 +126,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setOnMapLoadedCallback(this);
 
         placeMarkers();
+
+        if (activitySelectedEvent != null) {
+            //center the camera
+            Person eventPerson = dataCache.getPerson(activitySelectedEvent.getPersonID());
+            createLines(activitySelectedEvent);
+            setTextView(eventPerson, activitySelectedEvent);
+        }
 
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -379,7 +387,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void setTextView(Person eventPerson, Event selectedEvent) {
-        if (filteredEvents.contains(selectedEvent)) {
+        if (selectedEvent != null) {
             personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
             location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(),
                     selectedEvent.getCity(), selectedEvent.getCountry()));

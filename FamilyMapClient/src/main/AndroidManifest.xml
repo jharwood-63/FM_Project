@@ -16,10 +16,13 @@
         android:theme="@style/Theme.FamilyMapClient"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".EventActivity"
             android:exported="false"
             android:label="@string/event_activity_name"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PersonActivity"
             android:exported="false"

@@ -108,7 +108,7 @@ public class PersonActivity extends AppCompatActivity {
         private final String personID;
 
         ExpandableListAdapter(String personID) {
-            Set<Event> filteredEvents = dataCache.getFilteredEvents();
+            List<Event> filteredEvents = dataCache.getFilteredEvents();
             usedEvents = getUsedEvents(filteredEvents, personID);
             immediateFamily = getImmediateFamily(personID);
             this.personID = personID;
@@ -376,7 +376,7 @@ public class PersonActivity extends AppCompatActivity {
             return null;
         }
 
-        private List<Event> getUsedEvents(Set<Event> filteredEvents, String personID) {
+        private List<Event> getUsedEvents(List<Event> filteredEvents, String personID) {
             Map<String, Event> eventById = dataCache.getEventById();
             List<Event> usedEvents = new ArrayList<>();
 

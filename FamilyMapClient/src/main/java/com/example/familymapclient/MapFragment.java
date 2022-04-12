@@ -33,8 +33,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -53,7 +55,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private GoogleMap map;
     private final Set<Polyline> lines = new HashSet<>();
     private final DataCache dataCache = DataCache.getInstance();
-    private Set<Event> filteredEvents = new HashSet<>();
+    private List<Event> filteredEvents = new ArrayList<>();
     private final Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
     private final SettingsActivityViewModel settingsActivityViewModel = SettingsActivityViewModel.getInstance();
     private final MapViewModel mapViewModel = MapViewModel.getInstance();
@@ -185,8 +187,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private Set<Event> getFilteredEvents() {
-        Set<Event> eventsFiltered;
+    private List<Event> getFilteredEvents() {
+        List<Event> eventsFiltered;
 
         boolean fatherSide = settingsActivityViewModel.isFatherSideEnabled();
         boolean motherSide = settingsActivityViewModel.isMotherSideEnabled();
@@ -211,8 +213,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return eventsFiltered;
     }
 
-    private Set<Event> filterPaternal(boolean maleEvents, boolean femaleEvents) {
-        Set<Event> eventsFiltered = new HashSet<>();
+    private List<Event> filterPaternal(boolean maleEvents, boolean femaleEvents) {
+        List<Event> eventsFiltered = new ArrayList<>();
 
         Set<String> paternalMales = dataCache.getPaternalMales();
         Set<String> paternalFemales = dataCache.getPaternalFemales();
@@ -231,8 +233,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return eventsFiltered;
     }
 
-    private Set<Event> filterMaternal(boolean maleEvents, boolean femaleEvents) {
-        Set<Event> eventsFiltered = new HashSet<>();
+    private List<Event> filterMaternal(boolean maleEvents, boolean femaleEvents) {
+        List<Event> eventsFiltered = new ArrayList<>();
 
         Set<String> maternalMales = dataCache.getMaternalMales();
         Set<String> maternalFemales = dataCache.getMaternalFemales();
@@ -251,7 +253,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return eventsFiltered;
     }
 
-    private void fillFilteredEvents(Set<String> personIDs, Set<Event> eventsFiltered) {
+    private void fillFilteredEvents(Set<String> personIDs, List<Event> eventsFiltered) {
         for (String personID : personIDs) {
             eventsFiltered.addAll(personEvents.get(personID));
         }

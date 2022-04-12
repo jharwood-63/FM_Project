@@ -6,8 +6,10 @@ import com.example.familymapclient.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +52,8 @@ public class DataCache {
     //Key => personID, Value => set of all events associated with that person ID
     private final Map<String, Set<Event>> personEvents = new HashMap<>();
 
-    private Set<Event> filteredEvents = new HashSet<>();
+    private List<Event> filteredEvents = new ArrayList<>();
+    private final List<Person> personList = new ArrayList<>();
 
     private final Set<String> paternalMales = new HashSet<>();
     private final Set<String> paternalFemales = new HashSet<>();
@@ -92,6 +95,7 @@ public class DataCache {
 
         for (Person person : persons) {
             personById.put(person.getPersonID(), person);
+            personList.add(person);
         }
     }
 
@@ -222,12 +226,16 @@ public class DataCache {
         }
     }
 
-    public Set<Event> getFilteredEvents() {
+    public List<Event> getFilteredEvents() {
         return filteredEvents;
     }
 
-    public void setFilteredEvents(Set<Event> filteredEvents) {
+    public void setFilteredEvents(List<Event> filteredEvents) {
         this.filteredEvents = filteredEvents;
+    }
+
+    public List<Person> getPersonList() {
+        return personList;
     }
 
     public void setAuthToken(String authToken) {

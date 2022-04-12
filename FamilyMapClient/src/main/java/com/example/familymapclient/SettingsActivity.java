@@ -126,7 +126,6 @@ public class SettingsActivity extends AppCompatActivity {
         DataCache.getInstance().clearData();
         Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
         intent.putExtra(getString(R.string.login_key), false);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 

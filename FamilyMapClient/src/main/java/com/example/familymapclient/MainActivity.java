@@ -68,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.Lis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        Intent intent;
         switch(menuItem.getItemId()) {
             case R.id.searchMenuItem:
-
+                intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.settingsMenuItem:
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             default:

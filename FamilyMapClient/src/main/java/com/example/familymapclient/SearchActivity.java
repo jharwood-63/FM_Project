@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,21 +58,65 @@ public class SearchActivity extends AppCompatActivity {
          * make the lists smaller based on what is searched
          * send those lists to the recycler view
          */
+        EditText searchField = (EditText) findViewById(R.id.searchField);
+
+        Button searchButton = (Button) findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String searchKey = searchField.getText().toString().toLowerCase();
+
+                List<Event> searchedEvents = searchEvents(filteredEvents, searchKey);
+                List<Person> searchedPersons = searchPersons(personList, searchKey);
+
+                EventPersonAdapter adapter = new EventPersonAdapter(searchedEvents, searchedPersons);
+                recyclerView.setAdapter(adapter);
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(getString(R.string.login_key), true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(getString(R.string.login_key), true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private List<Event> searchEvents(List<Event> events, String searchKey) {
         List<Event> searchedEvent = new ArrayList<>();
 
-        /* What to search for:
-         * Case is ignored
-         * countries, cities, event types, and years
-         */
-
         for (Event event : events) {
-
+            if (checkEvent(event, searchKey)) {
+                searchedEvent.add(event);
+            }
         }
 
-        return null;
+        return searchedEvent;
+    }
+
+    private List<Person> searchPersons(List<Person> persons, String searchKey) {
+        List<Person> searchedPersons = new ArrayList<>();
+
+        for (Person person : persons) {
+            if (checkPerson(person, searchKey)) {
+                searchedPersons.add(person);
+            }
+        }
+
+        return searchedPersons;
     }
 
     private boolean checkEvent(Event event, String searchKey) {
@@ -82,13 +128,11 @@ public class SearchActivity extends AppCompatActivity {
         return country.contains(searchKey) || city.contains(searchKey) || eventType.contains(searchKey) || year.contains(searchKey);
     }
 
-    private List<Person> searchPersons(List<Person> persons, String searchKey) {
-        /* What to search for:
-         * Case is ignored
-         * first and last names
-         */
+    private boolean checkPerson(Person person, String searchKey) {
+        String firstName = person.getFirstName().toLowerCase();
+        String lastName = person.getLastName().toLowerCase();
 
-        return null;
+        return firstName.contains(searchKey) || lastName.contains(searchKey);
     }
 
     private class EventPersonAdapter extends RecyclerView.Adapter<EventPersonViewHolder> {

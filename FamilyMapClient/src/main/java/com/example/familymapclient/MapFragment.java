@@ -335,36 +335,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             Set<Event> fatherEvents = personEvents.get(father.getPersonID());
             Set<Event> motherEvents = personEvents.get(mother.getPersonID());
 
-            Event fatherBirthEvent = findEvent(fatherEvents, getString(R.string.birth_event));
-            Event motherBirthEvent = findEvent(motherEvents, getString(R.string.birth_event));
+            Event fatherEarliestEvent = findEarliestEvent(fatherEvents, getString(R.string.birth_event));
+            Event motherEarliestEvent = findEarliestEvent(motherEvents, getString(R.string.birth_event));
 
-            if (fatherBirthEvent != null && motherBirthEvent != null) {
+            if (fatherEarliestEvent != null && motherEarliestEvent != null) {
                 if (filteredEvents.contains(startEvent)) {
                     int color = getResources().getColor(R.color.family_line);
 
-                    if (filteredEvents.contains(fatherBirthEvent)) {
-                        drawLine(startEvent, fatherBirthEvent, color, lineWidth);
+                    if (filteredEvents.contains(fatherEarliestEvent)) {
+                        drawLine(startEvent, fatherEarliestEvent, color, lineWidth);
                     }
 
-                    if (filteredEvents.contains(motherBirthEvent)) {
-                        drawLine(startEvent, motherBirthEvent, color, lineWidth);
+                    if (filteredEvents.contains(motherEarliestEvent)) {
+                        drawLine(startEvent, motherEarliestEvent, color, lineWidth);
                     }
                 }
 
-                drawFamilyLines(father, fatherBirthEvent, lineWidth - 3);
-                drawFamilyLines(mother, motherBirthEvent, lineWidth - 3);
+                drawFamilyLines(father, fatherEarliestEvent, lineWidth - 3);
+                drawFamilyLines(mother, motherEarliestEvent, lineWidth - 3);
             }
         }
     }
 
-    private Event findEvent(Set<Event> events, String eventType) {
+    private Event findEarliestEvent(Set<Event> events, String eventType) {
+        Event earliestEvent = events.iterator().next();
+
         for (Event event : events) {
-            if (event.getEventType().equalsIgnoreCase(eventType)) {
-                return event;
+            if (event.getYear() < earliestEvent.getYear()) {
+                earliestEvent = event;
             }
         }
 
-        return null;
+        return earliestEvent;
     }
 
     private Event[] sortEvents(Set<Event> events) {

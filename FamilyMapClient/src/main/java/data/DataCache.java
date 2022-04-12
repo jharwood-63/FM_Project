@@ -73,6 +73,13 @@ public class DataCache {
             Person userPerson = findPerson(userPersonID);
 
             if (userPerson != null) {
+                if (userPerson.getGender().equals("m")) {
+                    paternalMales.add(userPerson.getPersonID());
+                }
+                else {
+                    maternalFemales.add(userPerson.getPersonID());
+                }
+
                 Person father = findPerson(userPerson.getFatherID());
                 Person mother = findPerson(userPerson.getMotherID());
 

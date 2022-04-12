@@ -1,8 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SearchActivity"/>
+    tools:context=".SearchActivity">
+
+    <RelativeLayout
+        android:id="@+id/searchView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/searchIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/marker_descriptor"
+            android:src="@drawable/ic_search" />
+
+        <EditText
+            android:id="@+id/searchField"
+            android:layout_width="260dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="15dp"
+            android:layout_toEndOf="@id/searchIcon"
+            android:importantForAutofill="no"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:text="@string/search_button"
+            android:layout_toEndOf="@id/searchField"/>
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchView"/>
+
+</RelativeLayout>

@@ -16,7 +16,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/marker_descriptor"
-            android:src="@drawable/ic_search" />
+            android:src="@drawable/ic_search_black" />
 
         <EditText
             android:id="@+id/searchField"

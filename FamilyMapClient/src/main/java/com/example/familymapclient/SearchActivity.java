@@ -203,23 +203,27 @@ public class SearchActivity extends AppCompatActivity {
             else {
                 marker = itemView.findViewById(R.id.genderMarker);
                 descriptionOne = itemView.findViewById(R.id.ancestorName);
-                descriptionTwo = null;
+                descriptionTwo = itemView.findViewById(R.id.relationshipName);
             }
         }
 
         private void bind(Event event) {
             this.event = event;
+            Map<String, Person> personByID = dataCache.getPersonById();
+            Person eventPerson = personByID.get(event.getPersonID());
+
             int color = (int) decideColor(event.getEventType());
             marker.setColorFilter(color);
             descriptionOne.setText(getString(R.string.event_description, event.getEventType().toUpperCase(), event.getCity(),
                     event.getCountry(), String.valueOf(event.getYear())));
-            descriptionTwo.setText(getString(R.string.family_person, person.getFirstName(), person.getLastName()));
+            descriptionTwo.setText(getString(R.string.family_person, eventPerson.getFirstName(), eventPerson.getLastName()));
         }
 
         private void bind(Person person) {
             this.person = person;
             marker.setImageDrawable(getIcon(person.getGender()));
             descriptionOne.setText(getString(R.string.family_person, person.getFirstName(), person.getLastName()));
+            descriptionTwo.setText("");
         }
 
         @Override

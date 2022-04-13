@@ -174,6 +174,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void placeMarkers() {
         filteredEvents = getFilteredEvents();
+
+        Set<Event> userEvents = getUserEventsToAdd();
+        if (userEvents != null) {
+            filteredEvents.addAll(userEvents);
+        }
+
         dataCache.setFilteredEvents(filteredEvents);
 
         for (Event event : filteredEvents) {
@@ -185,6 +191,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             marker.setTag(event);
         }
+    }
+
+    private Set<Event> getUserEventsToAdd() {
+        Map<String, Person> personByID = dataCache.getPersonById();
+        Map<String, Set<Event>> personEvents = dataCache.getPersonEvents();
+        Person userPerson = personByID.get(dataCache.getPersonID());
+
+        if (userPerson.getGender().equals("f")) {
+            if (!settingsActivityViewModel.isMotherSideEnabled() && settingsActivityViewModel.isFemaleEventsEnabled()) {
+                return personEvents.get(userPerson.getPersonID());
+            }
+        }
+        else if (userPerson.getGender().equals("m")) {
+            if (!settingsActivityViewModel.isFatherSideEnabled() && settingsActivityViewModel.isMaleEventsEnabled()) {
+                return personEvents.get(userPerson.getPersonID());
+            }
+        }
+
+        return null;
+        //if person is female
+        //if motherside disabled and female events enable add all user events
+        //if motherside disabled and female events disabled dont add the events
+
+        //if person is male
+        //if fatherside disabled and male events enabled all all user events
+        //if fatherside disabled and male events disabled dont add the events
     }
 
     private List<Event> getFilteredEvents() {

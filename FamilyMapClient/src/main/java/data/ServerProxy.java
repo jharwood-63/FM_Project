@@ -32,10 +32,10 @@ public class ServerProxy {
 
             Result result = null;
             if (urlString.contains("person")) {
-                result = (PersonResult) getResult(connection, "person");
+                result = getResult(connection, "person");
             }
             else if (urlString.contains("event")) {
-                result = (EventResult) getResult(connection, "event");
+                result = getResult(connection, "event");
             }
 
             return result;

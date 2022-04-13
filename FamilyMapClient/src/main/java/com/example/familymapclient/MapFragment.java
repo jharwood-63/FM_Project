@@ -291,18 +291,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             if (settingsActivityViewModel.isLifeLinesEnabled()) {
                 Set<Event> events = personEvents.get(selectedEvent.getPersonID());
-                Event[] sortedEvents = sortEvents(events);
+                List<Event> sortedEvents = dataCache.sortEventsByYear(new ArrayList<>(events));
 
                 color = getResources().getColor(R.color.life_line);
-                if (sortedEvents.length > 1) {
-                    if (filteredEvents.contains(sortedEvents[0]) && filteredEvents.contains(sortedEvents[1])) {
-                        drawLine(sortedEvents[0], sortedEvents[1], color, 10);
+                if (sortedEvents.size() > 1) {
+                    if (filteredEvents.contains(sortedEvents.get(0)) && filteredEvents.contains(sortedEvents.get(1))) {
+                        drawLine(sortedEvents.get(0), sortedEvents.get(1), color, 10);
                     }
                 }
 
-                for (int i = 1; i < sortedEvents.length; i++) {
-                    if (i != (sortedEvents.length - 1) && filteredEvents.contains(sortedEvents[i])) {
-                        drawLine(sortedEvents[i], sortedEvents[i + 1], color, 10);
+                for (int i = 1; i < sortedEvents.size(); i++) {
+                    if (i != (sortedEvents.size() - 1) && filteredEvents.contains(sortedEvents.get(i))) {
+                        drawLine(sortedEvents.get(i), sortedEvents.get(i + 1), color, 10);
                     }
                 }
             }
@@ -328,36 +328,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void drawFamilyLines(Person parent, Event startEvent, int lineWidth) {
         Map<String, Person> personById = dataCache.getPersonById();
+        int color = getResources().getColor(R.color.family_line);
         Person father = personById.get(parent.getFatherID());
         Person mother = personById.get(parent.getMotherID());
 
-        if (father != null && mother != null) {
-            Set<Event> fatherEvents = personEvents.get(father.getPersonID());
-            Set<Event> motherEvents = personEvents.get(mother.getPersonID());
+        Set<Event> fatherEvents;
+        Set<Event> motherEvents;
+        Event fatherEarliestEvent;
+        Event motherEarliestEvent;
 
-            Event fatherEarliestEvent = findEarliestEvent(fatherEvents, getString(R.string.birth_event));
-            Event motherEarliestEvent = findEarliestEvent(motherEvents, getString(R.string.birth_event));
+        if (lineWidth == 0) {
+            lineWidth += 5;
+        }
+        else if ((lineWidth - 4) <= 0) {
+            lineWidth = (lineWidth * 2) + 2;
+        }
 
-            if (fatherEarliestEvent != null && motherEarliestEvent != null) {
-                if (filteredEvents.contains(startEvent)) {
-                    int color = getResources().getColor(R.color.family_line);
+        if (father != null) {
+            fatherEvents = personEvents.get(father.getPersonID());
+            fatherEarliestEvent = findEarliestEvent(fatherEvents);
 
-                    if (filteredEvents.contains(fatherEarliestEvent)) {
-                        drawLine(startEvent, fatherEarliestEvent, color, lineWidth);
-                    }
-
-                    if (filteredEvents.contains(motherEarliestEvent)) {
-                        drawLine(startEvent, motherEarliestEvent, color, lineWidth);
-                    }
-                }
-
-                drawFamilyLines(father, fatherEarliestEvent, lineWidth - 3);
-                drawFamilyLines(mother, motherEarliestEvent, lineWidth - 3);
+            if (fatherEarliestEvent != null && filteredEvents.contains(startEvent) && filteredEvents.contains(fatherEarliestEvent)) {
+                drawLine(startEvent, fatherEarliestEvent, color, lineWidth);
             }
+
+            drawFamilyLines(father, fatherEarliestEvent, lineWidth - 4);
+        }
+
+        if (mother != null) {
+            motherEvents = personEvents.get(mother.getPersonID());
+            motherEarliestEvent = findEarliestEvent(motherEvents);
+
+            if (motherEarliestEvent != null && filteredEvents.contains(startEvent) && filteredEvents.contains(motherEarliestEvent)) {
+                drawLine(startEvent, motherEarliestEvent, color, lineWidth);
+            }
+
+            drawFamilyLines(mother, motherEarliestEvent, lineWidth - 4);
         }
     }
 
-    private Event findEarliestEvent(Set<Event> events, String eventType) {
+    private Event findEarliestEvent(Set<Event> events) {
         Event earliestEvent = events.iterator().next();
 
         for (Event event : events) {
@@ -367,27 +377,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return earliestEvent;
-    }
-
-    private Event[] sortEvents(Set<Event> events) {
-        Event[] sortedEvents = new Event[events.size()];
-        sortedEvents = events.toArray(sortedEvents);
-
-        Event temp;
-        for (int i = 0; i < sortedEvents.length; i++) {
-            for (int j = 1; j < sortedEvents.length - i; j++) {
-                if (sortedEvents[j-1].getYear() > sortedEvents[j].getYear()) {
-                    temp = sortedEvents[j-1];
-                    sortedEvents[j-1] = sortedEvents[j];
-                    sortedEvents[j] = temp;
-                }
-                else if (sortedEvents[j-1].getYear() == sortedEvents[j].getYear()) {
-
-                }
-            }
-        }
-
-        return sortedEvents;
     }
 
     private void drawLine(Event startEvent, Event endEvent, int lineColor, float width) {

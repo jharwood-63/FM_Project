@@ -46,18 +46,6 @@ public class SearchActivity extends AppCompatActivity {
         List<Event> filteredEvents = dataCache.getFilteredEvents();
         List<Person> personList = dataCache.getPersonList();
 
-        //List<Event> searchedEvents = searchEvents(filteredEvents);
-        //List<Person> searchedPersons = searchPersons(personList);
-        //EditText searchField = (EditText) findViewById(R.id.searchField);
-        //convert the searchKey to lower case
-
-        /* Search Algorith:
-         * recycler view is empty before a search is executed
-         * people come before events
-         * Make a copy of both lists
-         * make the lists smaller based on what is searched
-         * send those lists to the recycler view
-         */
         EditText searchField = (EditText) findViewById(R.id.searchField);
 
         Button searchButton = (Button) findViewById(R.id.searchButton);
@@ -249,7 +237,7 @@ public class SearchActivity extends AppCompatActivity {
                     getResources().getColor(R.color.orange_color), getResources().getColor(R.color.violet_color)};
 
             Map<String, Integer> colors = dataCache.getResourceColors();
-            int index = colors.get(eventType);
+            int index = colors.get(eventType.toLowerCase());
 
             return resourceColors[index];
         }

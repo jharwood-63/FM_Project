@@ -244,6 +244,31 @@ public class DataCache {
         this.filteredEvents = filteredEvents;
     }
 
+    public List<Event> sortEventsByYear(List<Event> events) {
+        Event temp;
+
+        for (int i = 0; i < events.size(); i++) {
+            for (int j = 1; j < events.size() - i; j++) {
+                if (events.get(j-1).getYear() > events.get(j).getYear()) {
+                    temp = events.get(j-1);
+                    events.set(j-1, events.get(j));
+                    events.set(j, temp);
+                }
+                else if (events.get(j-1).getYear() == events.get(j).getYear()) {
+                    String eventType1 = events.get(j-1).getEventType().toLowerCase();
+                    String eventType2 = events.get(j).getEventType().toLowerCase();
+                    if (eventType1.compareTo(eventType2) > 0) {
+                        temp = events.get(j-1);
+                        events.set(j-1, events.get(j));
+                        events.set(j, temp);
+                    }
+                }
+            }
+        }
+
+        return events;
+    }
+
     public List<Person> getPersonList() {
         return personList;
     }

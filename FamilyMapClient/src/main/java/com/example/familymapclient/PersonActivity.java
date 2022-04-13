@@ -277,7 +277,7 @@ public class PersonActivity extends AppCompatActivity {
                     getResources().getColor(R.color.orange_color), getResources().getColor(R.color.violet_color)};
 
             Map<String, Integer> colors = dataCache.getResourceColors();
-            int index = colors.get(eventType);
+            int index = colors.get(eventType.toLowerCase());
 
             return resourceColors[index];
         }
@@ -387,22 +387,9 @@ public class PersonActivity extends AppCompatActivity {
                 }
             }
 
-            sortEvents(usedEvents);
+            usedEvents = dataCache.sortEventsByYear(usedEvents);
 
             return usedEvents;
-        }
-
-        private void sortEvents(List<Event> usedEvents) {
-            Event temp;
-            for (int i = 0; i < usedEvents.size(); i++) {
-                for (int j = 1; j < usedEvents.size() - i; j++) {
-                    if (usedEvents.get(j-1).getYear() > usedEvents.get(j).getYear()) {
-                        temp = usedEvents.get(j-1);
-                        usedEvents.set(j-1, usedEvents.get(j));
-                        usedEvents.set(j, temp);
-                    }
-                }
-            }
         }
 
         private void addToImmediateFamilyMap(String personID, String relationship) {

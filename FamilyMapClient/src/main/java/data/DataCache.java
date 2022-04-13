@@ -192,6 +192,8 @@ public class DataCache {
         authToken = null;
         userPersonID = null;
 
+        otherColors.clear();
+        resourceColorIndices.clear();
         colorIndex = 0;
 
         personById.clear();
@@ -200,6 +202,7 @@ public class DataCache {
         personEvents.clear();
 
         filteredEvents.clear();
+        personList.clear();
 
         paternalMales.clear();
         paternalFemales.clear();

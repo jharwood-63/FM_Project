@@ -262,13 +262,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private float decideColor(String eventType) {
         Map<String, Float> newColors = dataCache.getOtherColors();
         int colorIndex = dataCache.getColorIndex();
-        dataCache.incrementColorIndex();
 
-        if (dataCache.getOtherColors().containsKey(eventType)) {
-            return newColors.get(eventType);
+        if (dataCache.getOtherColors().containsKey(eventType.toLowerCase())) {
+            return newColors.get(eventType.toLowerCase());
         }
         else {
-            dataCache.addColorToMap(eventType, colorIndex);
+            dataCache.addColorToMap(eventType.toLowerCase(), colorIndex);
+            dataCache.incrementColorIndex();
             return DataCache.OTHER_COLORS[colorIndex];
         }
     }
@@ -381,6 +381,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     sortedEvents[j-1] = sortedEvents[j];
                     sortedEvents[j] = temp;
                 }
+                else if (sortedEvents[j-1].getYear() == sortedEvents[j].getYear()) {
+
+                }
             }
         }
 
@@ -404,7 +407,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (filteredEvents.contains(selectedEvent)) {
             personName.setText(getString(R.string.person_name, eventPerson.getFirstName(), eventPerson.getLastName()));
             location.setText(getString(R.string.location_name, selectedEvent.getEventType().toUpperCase(),
-                    selectedEvent.getCity(), selectedEvent.getCountry()));
+                    selectedEvent.getCity(), selectedEvent.getCountry(), String.valueOf(selectedEvent.getYear())));
 
             String personGender = eventPerson.getGender();
 

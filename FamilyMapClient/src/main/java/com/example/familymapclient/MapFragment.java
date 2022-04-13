@@ -210,13 +210,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         return null;
-        //if person is female
-        //if motherside disabled and female events enable add all user events
-        //if motherside disabled and female events disabled dont add the events
-
-        //if person is male
-        //if fatherside disabled and male events enabled all all user events
-        //if fatherside disabled and male events disabled dont add the events
     }
 
     private List<Event> getFilteredEvents() {
@@ -310,9 +303,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (filteredEvents.contains(selectedEvent)) {
             if (settingsActivityViewModel.isSpouseLinesEnabled()) {
-                Event spouseBirthEvent = getSpouseBirthEvent(selectedEvent.getPersonID());
-                if (filteredEvents.contains(spouseBirthEvent)) {
-                    drawLine(selectedEvent, spouseBirthEvent, color, 10);
+                Event spouseEarliestEvent = getSpouseEarliestEvent(selectedEvent.getPersonID());
+                if (filteredEvents.contains(spouseEarliestEvent)) {
+                    drawLine(selectedEvent, spouseEarliestEvent, color, 10);
                 }
             }
 
@@ -341,21 +334,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private Event getSpouseBirthEvent(String personID) {
+    private Event getSpouseEarliestEvent(String personID) {
         Person eventPerson = dataCache.getPerson(personID);
         String spouseID = eventPerson.getSpouseID();
 
         Set<Event> events = personEvents.get(spouseID);
 
-        Event spouseBirth = null;
-        for (Event event : events) {
-            if (event.getEventType().equals(getString(R.string.birth_event))) {
-                spouseBirth = event;
-                break;
-            }
-        }
-
-        return spouseBirth;
+        return findEarliestEvent(events);
     }
 
     private void drawFamilyLines(Person parent, Event startEvent, int lineWidth) {

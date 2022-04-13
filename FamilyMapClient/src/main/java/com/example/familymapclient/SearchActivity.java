@@ -28,6 +28,7 @@ import java.util.Map;
 import data.DataCache;
 import model.Event;
 import model.Person;
+import viewmodels.SearchActivityHelper;
 
 public class SearchActivity extends AppCompatActivity {
     private static final int EVENT_ITEM_VIEW_TYPE = 0;
@@ -43,6 +44,8 @@ public class SearchActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.RecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
+        SearchActivityHelper helper = new SearchActivityHelper();
+
         List<Event> filteredEvents = dataCache.getFilteredEvents();
         List<Person> personList = dataCache.getPersonList();
 
@@ -54,8 +57,8 @@ public class SearchActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String searchKey = searchField.getText().toString().toLowerCase();
 
-                List<Event> searchedEvents = searchEvents(filteredEvents, searchKey);
-                List<Person> searchedPersons = searchPersons(personList, searchKey);
+                List<Event> searchedEvents = helper.searchEvents(filteredEvents, searchKey);
+                List<Person> searchedPersons = helper.searchPersons(personList, searchKey);
 
                 EventPersonAdapter adapter = new EventPersonAdapter(searchedEvents, searchedPersons);
                 recyclerView.setAdapter(adapter);
@@ -82,7 +85,7 @@ public class SearchActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-
+    /*
     private List<Event> searchEvents(List<Event> events, String searchKey) {
         List<Event> searchedEvent = new ArrayList<>();
 
@@ -122,7 +125,7 @@ public class SearchActivity extends AppCompatActivity {
 
         return firstName.contains(searchKey) || lastName.contains(searchKey);
     }
-
+    */
     private class EventPersonAdapter extends RecyclerView.Adapter<EventPersonViewHolder> {
         private final List<Event> searchedEvents;
         private final List<Person> searchedPersons;

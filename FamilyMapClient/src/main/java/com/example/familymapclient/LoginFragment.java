@@ -63,13 +63,6 @@ public class LoginFragment extends Fragment {
         RadioButton maleButton = (RadioButton) view.findViewById(R.id.radio_male);
         RadioButton femaleButton = (RadioButton) view.findViewById(R.id.radio_female);
 
-        //FIXME: FOR TESTING PURPOSES ONLY
-        serverHost.setText("10.0.2.2");
-        serverPort.setText("7979");
-        username.setText("username");
-        password.setText("password");
-
-
         Button loginButton = view.findViewById(R.id.loginButton);
         Button registerButton = view.findViewById(R.id.registerButton);
 
@@ -80,12 +73,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
-                if (isLogin) {
-                    loginButton.setEnabled(true);
-                }
-                else {
-                    loginButton.setEnabled(false);
-                }
+                loginButton.setEnabled(isLogin);
             }
 
             @Override
@@ -99,12 +87,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
-                if (isLogin) {
-                    loginButton.setEnabled(true);
-                }
-                else {
-                    loginButton.setEnabled(false);
-                }
+                loginButton.setEnabled(isLogin);
             }
 
             @Override
@@ -118,12 +101,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
-                if (isLogin) {
-                    loginButton.setEnabled(true);
-                }
-                else {
-                    loginButton.setEnabled(false);
-                }
+                loginButton.setEnabled(isLogin);
             }
 
             @Override
@@ -137,12 +115,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 boolean isLogin = isLogin(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString());
-                if (isLogin) {
-                    loginButton.setEnabled(true);
-                }
-                else {
-                    loginButton.setEnabled(false);
-                }
+                loginButton.setEnabled(isLogin);
             }
 
             @Override
@@ -158,12 +131,7 @@ public class LoginFragment extends Fragment {
                 boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
                         email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                if (isRegister) {
-                    registerButton.setEnabled(true);
-                }
-                else {
-                    registerButton.setEnabled(false);
-                }
+                registerButton.setEnabled(isRegister);
             }
 
             @Override
@@ -179,12 +147,7 @@ public class LoginFragment extends Fragment {
                 boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
                         email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                if (isRegister) {
-                    registerButton.setEnabled(true);
-                }
-                else {
-                    registerButton.setEnabled(false);
-                }
+                registerButton.setEnabled(isRegister);
             }
 
             @Override
@@ -200,12 +163,7 @@ public class LoginFragment extends Fragment {
                 boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
                         email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                if (isRegister) {
-                    registerButton.setEnabled(true);
-                }
-                else {
-                    registerButton.setEnabled(false);
-                }
+                registerButton.setEnabled(isRegister);
             }
 
             @Override
@@ -231,12 +189,7 @@ public class LoginFragment extends Fragment {
                 boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
                         email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                if (isRegister) {
-                    registerButton.setEnabled(true);
-                }
-                else {
-                    registerButton.setEnabled(false);
-                }
+                registerButton.setEnabled(isRegister);
             }
         });
 
@@ -259,12 +212,7 @@ public class LoginFragment extends Fragment {
                 boolean isRegister = isRegister(serverHost.getText().toString(), serverPort.getText().toString(), username.getText().toString(), password.getText().toString(),
                         email.getText().toString(), firstName.getText().toString(), lastName.getText().toString(), gender);
 
-                if (isRegister) {
-                    registerButton.setEnabled(true);
-                }
-                else {
-                    registerButton.setEnabled(false);
-                }
+                registerButton.setEnabled(isRegister);
             }
         });
 

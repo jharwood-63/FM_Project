@@ -2,7 +2,6 @@ package data;
 
 import android.util.Log;
 
-import com.example.familymapclient.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.io.IOException;
@@ -149,12 +148,8 @@ public class DataCache {
     }
 
     private Person findPerson(String personID) {
-        if (personID != null || !personID.equals("")) {
-            for (Map.Entry<String, Person> pair : personById.entrySet()) {
-                if (pair.getKey().equals(personID)) {
-                    return pair.getValue();
-                }
-            }
+        if (personID != null && personById.containsKey(personID)) {
+            return personById.get(personID);
         }
 
         return null;

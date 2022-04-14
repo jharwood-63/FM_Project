@@ -173,7 +173,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void placeMarkers() {
-        filteredEvents = getFilteredEvents();
+        filteredEvents = mapViewModel.getFilteredEvents();
 
         Set<Event> userEvents = getUserEventsToAdd();
         if (userEvents != null) {
@@ -211,7 +211,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         return null;
     }
-
+    /*
     private List<Event> getFilteredEvents() {
         List<Event> eventsFiltered;
 
@@ -283,7 +283,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             eventsFiltered.addAll(personEvents.get(personID));
         }
     }
-
+    */
     private float decideColor(String eventType) {
         Map<String, Float> newColors = dataCache.getOtherColors();
         int colorIndex = dataCache.getColorIndex();
